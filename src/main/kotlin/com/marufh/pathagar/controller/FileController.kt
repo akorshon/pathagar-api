@@ -12,9 +12,9 @@ import org.springframework.core.io.Resource
 @RequestMapping("/api/public/files")
 class FileController(private val fileDownloadService: FileDownloadService) {
 
-    @GetMapping("/book/{subPath}/{fileName}")
-    fun getFile(@PathVariable subPath: String, @PathVariable fileName: String ): ResponseEntity<Resource> {
-        return fileDownloadService.getFile("/book/${subPath}/${fileName}")
+    @GetMapping("/{path}/{subPath}/{fileName}")
+    fun getFile(@PathVariable path: String, @PathVariable subPath: String, @PathVariable fileName: String ): ResponseEntity<Resource> {
+        return fileDownloadService.getFile("/$path/${subPath}/${fileName}")
     }
 
 }

@@ -8,5 +8,5 @@ import org.springframework.context.annotation.Configuration
 data class FileProperties(
     var base: String = "",
     var book: String = "",
-    var image: String = ""
+    var author: String = ""
 )

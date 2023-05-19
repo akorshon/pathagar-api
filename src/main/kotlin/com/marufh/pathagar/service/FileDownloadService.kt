@@ -1,6 +1,7 @@
 package com.marufh.pathagar.service
 
 import com.marufh.pathagar.config.FileProperties
+import com.marufh.pathagar.controller.exception.NotFoundException
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.http.CacheControl
@@ -16,6 +17,9 @@ class FileDownloadService(
 
     fun getFile(path: String): ResponseEntity<Resource> {
         val filePath = Path.of(fileProperties.base + path)
+        if(filePath.toFile().exists().not()) {
+            throw NotFoundException("File not found: $path")
+        }
         val resource = UrlResource(filePath.toUri())
         return ResponseEntity.status(HttpStatus.OK)
             .cacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
