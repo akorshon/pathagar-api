@@ -1,7 +1,10 @@
 package com.marufh.pathagar.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
 
 @Entity
@@ -21,4 +24,10 @@ class Author(
 
     @Column(name = "image")
     var image: String? = null,
-): BaseEntity()
+
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "authors")
+    var books: Set<Book> = mutableSetOf(),
+
+    ): BaseEntity()
+

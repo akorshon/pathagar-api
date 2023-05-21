@@ -24,6 +24,9 @@ class Book(
     var fileType: FileType? = null,
 
     @Column(name = "file_path")
-    var filePath: String? = null
+    var filePath: String? = null,
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    var authors: MutableSet<Author> = mutableSetOf()
 
 ): BaseEntity()

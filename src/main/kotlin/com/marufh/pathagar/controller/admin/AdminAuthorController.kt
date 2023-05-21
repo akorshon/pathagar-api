@@ -15,10 +15,11 @@ class AdminAuthorController(
     fun create(@ModelAttribute authorDto: AuthorDto) = ResponseEntity.ok(authorService.create(authorDto))
 
     @PutMapping
-    fun update(@RequestBody authorDto: AuthorDto) = ResponseEntity.ok(authorService.update(authorDto));
+    fun update(@ModelAttribute authorDto: AuthorDto) = ResponseEntity.ok(authorService.update(authorDto));
 
     @GetMapping()
-    fun getAll(pageable: Pageable) = ResponseEntity.ok(authorService.findAll(pageable));
+    fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable) = ResponseEntity
+        .ok(authorService.findAll(search, pageable));
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: String) = authorService.delete(id)

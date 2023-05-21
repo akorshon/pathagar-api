@@ -20,7 +20,7 @@ class AuthorService(
     private val authorRepository: AuthorRepository) {
 
     fun create(authorDto: AuthorDto): Author {
-        val filePath = fileUploadService.upload(authorDto.file, Path.of(fileProperties.author), authorDto.file.originalFilename!!);
+        val filePath = fileUploadService.upload(authorDto.file!!, Path.of(fileProperties.author), authorDto.file.originalFilename!!);
         val thumbPath = fileUploadService.resizeImage(ImageIO.read(filePath.toFile()), filePath.parent.resolve( "${authorDto.name}_thumb.jpg").toFile(), 200, 300)
         val author = Author(
             name = authorDto.name,
@@ -44,8 +44,8 @@ class AuthorService(
             .orElseThrow { EntityNotFoundException("Author not found with id: $id") }
     }
 
-    fun findAll(pageable: Pageable): Page<Author> {
-        return authorRepository.findAll(pageable)
+    fun findAll(search: String?,  pageable: Pageable): Page<Author> {
+        return authorRepository.findAll(search, pageable)
     }
 
     fun delete(id: String) {

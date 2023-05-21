@@ -8,5 +8,6 @@ data class BookDto(
     val id: String? = null,
     val description: String? = null,
     val fileType: FileType = FileType.PDF,
-    val file: MultipartFile
+    val file: MultipartFile? = null,
+    val authors: Set<String>? = null,
 )
