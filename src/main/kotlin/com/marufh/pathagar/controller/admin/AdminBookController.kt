@@ -13,7 +13,7 @@ class AdminBookController(
     private val bookService: BookService) {
 
     @PostMapping
-    fun create(@ModelAttribute bookDto: BookDto) = ResponseEntity(bookService.create(bookDto), HttpStatus.CREATED);
+    fun create(@RequestBody bookDto: BookDto) = ResponseEntity(bookService.create(bookDto), HttpStatus.CREATED);
 
     @PutMapping
     fun update(@ModelAttribute bookDto: BookDto) = ResponseEntity.ok(bookService.update(bookDto));

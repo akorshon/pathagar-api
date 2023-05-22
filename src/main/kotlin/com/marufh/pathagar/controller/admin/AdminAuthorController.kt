@@ -12,7 +12,7 @@ class AdminAuthorController(
     private val authorService: AuthorService) {
 
     @PostMapping
-    fun create(@ModelAttribute authorDto: AuthorDto) = ResponseEntity.ok(authorService.create(authorDto))
+    fun create(@RequestBody authorDto: AuthorDto) = ResponseEntity.ok(authorService.create(authorDto))
 
     @PutMapping
     fun update(@ModelAttribute authorDto: AuthorDto) = ResponseEntity.ok(authorService.update(authorDto));

@@ -1,5 +1,8 @@
 package com.marufh.pathagar.service
 
+import com.marufh.pathagar.config.FileProperties
+import com.marufh.pathagar.dto.FileDto
+import com.marufh.pathagar.entity.FileType
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.awt.Dimension
@@ -13,11 +16,17 @@ import java.nio.file.StandardCopyOption
 import javax.imageio.ImageIO
 
 @Service
-class FileUploadService {
+class FileUploadService(
+    private val fileProperties: FileProperties,) {
 
-    fun upload(file: File, path: Path, name: String) = move(file.inputStream(), path, name)
+    fun upload(fileDto: FileDto): String  {
+        when (fileDto.fileType) {
+            FileType.BOOK -> return upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
+            FileType.AUTHOR_IMAGE -> return upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
+        }
+    }
 
-    fun upload(file: MultipartFile,  path: Path, name: String) = move(file.inputStream, path, name)
+    fun upload(file: MultipartFile,  path: Path, name: String) = getRelativePath(move(file.inputStream, path, name))
 
     fun resizeImage(bi: BufferedImage, file: File, width: Int, height: Int): Path {
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
@@ -70,5 +79,9 @@ class FileUploadService {
     private fun getFinalPath(path: Path, name: String): Path {
         val subDirectory = name.replace("\\.[^/.]+\$".toRegex(), "").trim().replace("\\s+".toRegex(), "_")
         return path.resolve(subDirectory).apply { Files.createDirectories(this) }.resolve(name);
+    }
+
+    private fun getRelativePath(filePath: Path): String {
+        return Path.of(fileProperties.base).relativize(filePath).toString()
     }
 }

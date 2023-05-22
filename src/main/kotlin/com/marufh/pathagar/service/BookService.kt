@@ -21,13 +21,13 @@ class BookService(
     private val fileUploadService: FileUploadService) {
 
     fun create(bookDto: BookDto): Book {
-        val filePath = fileUploadService.upload(bookDto.file!!, Path.of(fileProperties.book), bookDto.file.originalFilename!!);
-        val thumbPath = pdfService.convertToThumb(filePath, filePath.parent)
+        val path = Path.of(fileProperties.base +"/"+ bookDto.filePath)
+        val thumbPath = pdfService.convertToThumb(path, path.parent)
 
         val book = Book(
             name = bookDto.name,
             deleted = false,
-            filePath = getRelativePath(filePath),
+            filePath = bookDto.filePath,
             coverImage = getRelativePath(thumbPath)
         )
         return bookRepository.save(book)

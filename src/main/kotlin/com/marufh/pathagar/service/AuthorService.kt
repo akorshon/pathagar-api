@@ -20,13 +20,14 @@ class AuthorService(
     private val authorRepository: AuthorRepository) {
 
     fun create(authorDto: AuthorDto): Author {
-        val filePath = fileUploadService.upload(authorDto.file!!, Path.of(fileProperties.author), authorDto.file.originalFilename!!);
+        val filePath = Path.of(fileProperties.base +"/"+ authorDto.image)
         val thumbPath = fileUploadService.resizeImage(ImageIO.read(filePath.toFile()), filePath.parent.resolve( "${authorDto.name}_thumb.jpg").toFile(), 200, 300)
+
         val author = Author(
             name = authorDto.name,
             description = authorDto.description,
             deleted = false,
-            image = getRelativePath(filePath),
+            image = authorDto.image,
             thumbnail = getRelativePath(thumbPath)
         )
         return authorRepository.save(author);
