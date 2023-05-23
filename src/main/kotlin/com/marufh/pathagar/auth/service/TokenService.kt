@@ -22,7 +22,7 @@ class TokenService(
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plus(2, ChronoUnit.DAYS))
             .subject(user.email)
-            .claim("userId", user.id)
+            .claim("roles", user.roles)
             .build()
         return jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).tokenValue
     }
@@ -31,8 +31,8 @@ class TokenService(
     fun parseToken(token: String): User? {
         return try {
             val jwt = jwtDecoder.decode(token)
-            val userId = jwt.claims["userId"] as String
-            usrService.findById(userId)
+            val email = jwt.subject
+            usrService.findByEmail(email)
         } catch (e: Exception) {
             null
         }

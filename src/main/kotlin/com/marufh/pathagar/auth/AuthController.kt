@@ -2,6 +2,7 @@ package com.marufh.pathagar.auth
 
 import com.marufh.pathagar.auth.dto.LoginDto
 import com.marufh.pathagar.auth.dto.TokenDto
+import com.marufh.pathagar.auth.entity.Role
 import com.marufh.pathagar.auth.entity.User
 import com.marufh.pathagar.auth.service.HashService
 import com.marufh.pathagar.auth.service.TokenService
@@ -23,7 +24,7 @@ class AuthController(
     @PostMapping("/login")
     fun login(@RequestBody login: LoginDto): TokenDto {
         println("login: $login")
-        val user = userService.findByName(login.email)?: throw NotFoundException("Invalid username or password")
+        val user = userService.findByEmail(login.email)?: throw NotFoundException("Invalid username or password")
         if (!hashService.checkBcrypt(login.password, user.password)) {
             throw NotFoundException("Invalid username or password")
         }
@@ -32,11 +33,11 @@ class AuthController(
 
     @PostMapping("/registration")
     fun register(@RequestBody login: LoginDto): TokenDto {
-        val user = userService.findByName(login.email)
+        val user = userService.findByEmail(login.email)
         if (user != null) {
             throw NotFoundException("User already exists")
         }
-        val newUser = userService.save(User(login.email, hashService.hashBcrypt(login.password)))
+        val newUser = userService.save(User(login.email, hashService.hashBcrypt(login.password), setOf(Role.ROLE_ADMIN)))
         return TokenDto(tokenService.generateToken(newUser))
     }
 }

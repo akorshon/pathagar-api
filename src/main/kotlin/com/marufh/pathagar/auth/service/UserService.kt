@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository) {
 
-    fun findByName(name: String) = userRepository.findByName(name)
+    fun findByEmail(email: String) = userRepository.findByEmail(email)
 
     fun save(user: User) = userRepository.save(user)
 

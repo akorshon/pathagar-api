@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.Query
 
 interface UserRepository : JpaRepository<User, String> {
 
-    @Query("SELECT u FROM User u WHERE u.email = ?1")
-    fun findByName(email: String): User?
+    @Query("SELECT u FROM User u JOIN FETCH u.roles WHERE u.email = ?1")
+    fun findByEmail(email: String): User?
 }

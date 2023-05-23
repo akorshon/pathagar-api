@@ -32,8 +32,9 @@ class SecurityConfig(
         http.oauth2ResourceServer().jwt()
             http.authenticationManager { auth ->
                 val jwt = auth as BearerTokenAuthenticationToken
+                println(jwt.token)
                 val user = tokenService.parseToken(jwt.token)?: throw InvalidBearerTokenException("Invalid token")
-                UsernamePasswordAuthenticationToken(user, null, listOf(SimpleGrantedAuthority("ADMIN")))
+                UsernamePasswordAuthenticationToken(user, null, listOf(user.roles.map { SimpleGrantedAuthority(it.name) }).flatten())
             }
 
         http.cors()

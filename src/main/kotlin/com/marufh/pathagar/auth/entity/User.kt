@@ -1,9 +1,7 @@
 package com.marufh.pathagar.auth.entity
 
 import com.marufh.pathagar.entity.BaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "user")
@@ -13,4 +11,10 @@ data class User(
 
     @Column
     var password: String = "",
+
+    @ElementCollection(targetClass = Role::class)
+    @JoinTable(name = "user_role")
+    @JoinColumn(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    var roles: Set<Role> = emptySet()
 ): BaseEntity()
