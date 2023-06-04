@@ -1,5 +1,6 @@
 package com.marufh.pathagar.auth.config
 
+import com.marufh.pathagar.auth.RestAuthenticationEntryPoint
 import com.marufh.pathagar.auth.service.TokenService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
@@ -19,33 +20,55 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(private val tokenService: TokenService) {
+class SecurityConfig(
+    private val tokenService: TokenService,
+    private val authenticationEntryPoint: RestAuthenticationEntryPoint) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.authorizeHttpRequests()
+        logger.info("Configuring security filter chain")
+
+            http
+            .csrf().disable()
+            .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
+
+            .and()
+            .cors()
+
+            .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
+            .and()
+            .authorizeHttpRequests()
             .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
             .requestMatchers(HttpMethod.POST, "/api/auth/registration").permitAll()
-            .requestMatchers("/api/admin/**").authenticated()
-            .anyRequest().permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
 
-        http.oauth2ResourceServer().jwt()
-            http.authenticationManager { auth ->
+            .and()
+            .authorizeHttpRequests()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/user/**").hasRole( "USER")
+            .anyRequest().authenticated()
+
+
+            .and()
+            .oauth2ResourceServer().jwt()
+            .authenticationManager { auth ->
                 val jwt = auth as BearerTokenAuthenticationToken
                 val user = tokenService.parseToken(jwt.token)?: throw InvalidBearerTokenException("Invalid token")
                 UsernamePasswordAuthenticationToken(user, null, listOf(user.roles.map { SimpleGrantedAuthority(it.name) }).flatten())
             }
 
-        http.cors()
-        http.csrf().disable()
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         return http.build()
     }
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
+        logger.info("Configuring cors")
+
         val configuration = CorsConfiguration()
         configuration.allowedOrigins = listOf("*")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")

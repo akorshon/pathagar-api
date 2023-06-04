@@ -12,9 +12,8 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/admin/user-books")
-class AdminUserBookController(
-    private val userBookService: UserBookService) {
+@RequestMapping("/api/user/user-books")
+class UserBookController(val userBookService: UserBookService) {
 
     @PostMapping
     fun create(@RequestBody userBookDto: UserBookDto, authentication: Authentication) = ResponseEntity(userBookService.create(authentication.toUser(), userBookDto), HttpStatus.CREATED);

@@ -23,8 +23,8 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -32,14 +32,20 @@ dependencies {
 	implementation("org.apache.pdfbox:jbig2-imageio:3.0.2")
 	implementation("com.github.jai-imageio:jai-imageio-core:1.4.0")
 	implementation("com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0")
-	implementation("com.github.librepdf:openpdf:1.3.30")
 
-	compileOnly("org.projectlombok:lombok")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
+
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-security-test")
+	testImplementation("org.testcontainers:junit-jupiter:1.17.6")
+	testImplementation("org.testcontainers:mysql:1.17.6")
+
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+
 }
 
 tasks.withType<KotlinCompile> {

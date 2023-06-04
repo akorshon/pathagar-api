@@ -1,12 +1,10 @@
 package com.marufh.pathagar.book.service
 
 import com.marufh.pathagar.auth.entity.User
-import com.marufh.pathagar.auth.repository.UserRepository
 import com.marufh.pathagar.book.dto.UserBookDto
 import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.entity.UserBookStatus
 import com.marufh.pathagar.book.repository.UserBookRepository
-import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
