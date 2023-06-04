@@ -1,6 +1,6 @@
 package com.marufh.pathagar.auth.entity
 
-import com.marufh.pathagar.entity.BaseEntity
+import com.marufh.pathagar.base.BaseEntity
 import jakarta.persistence.*
 
 @Entity

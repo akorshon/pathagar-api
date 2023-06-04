@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pathagar-api
+  labels:
+    app: pathagar
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pathagar-api
+  template:
+    metadata:
+      labels:
+        app: pathagar-api
+    spec:
+      # Container
+      containers:
+        - name: pathagar-api
+          image: eu.gcr.io/marufh/pathagar-api:v52
+          volumeMounts:
+            - name: pathagar-persistent-storage
+              mountPath: /opt/data
+              readOnly: true
+            - name: pathagar-application-properties
+              mountPath: /opt/pathagar/application-prod.properties
+              subPath: application-prod.properties
+              readOnly: true
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+          ports:
+            - containerPort: 8080
+      # Volumes
+      volumes:
+        - name: pathagar-persistent-storage
+          persistentVolumeClaim:
+            claimName: pathagar-pv-claim
+        - name: pathagar-application-properties
+          configMap:
+            name: pathagar-config-prod
+

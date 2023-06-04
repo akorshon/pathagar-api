@@ -199,3 +199,6 @@ README.html
 *.iml
 .idea
 .exercism
+
+# Ignore deployment directory
+deployment/

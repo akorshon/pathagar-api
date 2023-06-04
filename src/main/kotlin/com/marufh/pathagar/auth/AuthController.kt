@@ -7,7 +7,8 @@ import com.marufh.pathagar.auth.entity.User
 import com.marufh.pathagar.auth.service.HashService
 import com.marufh.pathagar.auth.service.TokenService
 import com.marufh.pathagar.auth.service.UserService
-import com.marufh.pathagar.controller.exception.NotFoundException
+import com.marufh.pathagar.exception.NotFoundException
+import com.marufh.pathagar.exception.UnauthorizedException
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,11 +34,12 @@ class AuthController(
 
     @PostMapping("/registration")
     fun register(@RequestBody login: LoginDto): TokenDto {
+
         val user = userService.findByEmail(login.email)
         if (user != null) {
             throw NotFoundException("User already exists")
         }
-        val newUser = userService.save(User(login.email, hashService.hashBcrypt(login.password), setOf(Role.ROLE_ADMIN)))
+        val newUser = userService.save(User(login.email, hashService.hashBcrypt(login.password), setOf(Role.ROLE_USER)))
         return TokenDto(tokenService.generateToken(newUser))
     }
 }

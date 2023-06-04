@@ -1,6 +1,7 @@
 package com.marufh.pathagar.auth.config
 
 import com.marufh.pathagar.auth.service.TokenService
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -18,8 +19,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(
-    private val tokenService: TokenService) {
+class SecurityConfig(private val tokenService: TokenService) {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -32,7 +34,6 @@ class SecurityConfig(
         http.oauth2ResourceServer().jwt()
             http.authenticationManager { auth ->
                 val jwt = auth as BearerTokenAuthenticationToken
-                println(jwt.token)
                 val user = tokenService.parseToken(jwt.token)?: throw InvalidBearerTokenException("Invalid token")
                 UsernamePasswordAuthenticationToken(user, null, listOf(user.roles.map { SimpleGrantedAuthority(it.name) }).flatten())
             }
@@ -40,7 +41,6 @@ class SecurityConfig(
         http.cors()
         http.csrf().disable()
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
         return http.build()
     }
 

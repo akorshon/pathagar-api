@@ -20,13 +20,8 @@ class JwtEncodingConfig(
     private val secretKey = SecretKeySpec(jwtKey.toByteArray(), "HmacSHA256")
 
     @Bean
-    fun jwtDecoder(): JwtDecoder {
-        return NimbusJwtDecoder.withSecretKey(secretKey).build()
-    }
+    fun jwtDecoder(): JwtDecoder = NimbusJwtDecoder.withSecretKey(secretKey).build()
 
     @Bean
-    fun jwtEncoder(): JwtEncoder {
-        val secret = ImmutableSecret<SecurityContext>(secretKey)
-        return NimbusJwtEncoder(secret)
-    }
+    fun jwtEncoder(): JwtEncoder = NimbusJwtEncoder(ImmutableSecret(secretKey))
 }
