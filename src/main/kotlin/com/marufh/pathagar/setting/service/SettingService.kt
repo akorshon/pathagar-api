@@ -1,9 +1,8 @@
-package com.marufh.pathagar.setting
+package com.marufh.pathagar.setting.service
 
 import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.config.FileProperties
-import com.marufh.pathagar.file.service.FileUploadService
 import com.marufh.pathagar.file.service.PdfService
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service
 import java.io.File
 import java.io.FileInputStream
 import java.math.BigInteger
-import java.nio.file.Path
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -23,6 +21,7 @@ class SettingService(
     private val pdfService: PdfService,
     private val bookRepository: BookRepository,
     private val fileProperties: FileProperties, ) {
+
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun generateHash() {

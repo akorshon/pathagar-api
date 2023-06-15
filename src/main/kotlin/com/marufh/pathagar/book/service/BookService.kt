@@ -73,6 +73,13 @@ class BookService(
         return bookRepository.save(book)
     }
 
+    fun findById(id: String): Book {
+        logger.info("Finding book: $id")
+
+        return bookRepository.findById(id)
+            .orElseThrow { EntityNotFoundException("Book not found with id: $id") }
+    }
+
     fun findAll(search: String?, pageable: Pageable): Page<Book> {
         logger.info("Finding all books")
 
@@ -96,8 +103,4 @@ class BookService(
         }
     }
 
-
-    private fun getRelativePath(filePath: Path): String {
-        return Path.of(fileProperties.base).relativize(filePath).toString()
-    }
 }

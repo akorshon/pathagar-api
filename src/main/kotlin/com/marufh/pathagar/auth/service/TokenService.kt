@@ -1,6 +1,7 @@
 package com.marufh.pathagar.auth.service
 
 import com.marufh.pathagar.auth.entity.User
+import org.slf4j.LoggerFactory
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtDecoder
@@ -12,11 +13,16 @@ import java.time.temporal.ChronoUnit
 
 @Service
 class TokenService(
-    private val jwtEncoder: JwtEncoder,
-    private val jwtDecoder: JwtDecoder,
-    private val usrService: UserService) {
+    val jwtEncoder: JwtEncoder,
+    val jwtDecoder: JwtDecoder,
+    val usrService: UserService) {
+
+    private val logger = LoggerFactory.getLogger(javaClass)
+
 
     fun generateToken(user: User): String {
+        logger.info("Generating token for user {}", user.email)
+
         val jwsHeader = JwsHeader.with {"HS256"}.build()
         val claims = JwtClaimsSet.builder()
             .issuedAt(Instant.now())
@@ -29,6 +35,8 @@ class TokenService(
 
 
     fun parseToken(token: String): User? {
+        logger.info("Parsing token {}", token)
+
         return try {
             val jwt = jwtDecoder.decode(token)
             val email = jwt.subject

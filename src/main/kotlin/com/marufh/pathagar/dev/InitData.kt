@@ -18,22 +18,19 @@ class InitData(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override
-    fun run(args: ApplicationArguments?) {
+    override fun run(args: ApplicationArguments?) {
         logger.info("Initializing data for dev profile")
 
         val email = "admin@gmail.com";
 
-        userRepository.findByEmail(email).run {
-            if (this != null) {
+        userRepository.findByEmail(email)?.let {
                 logger.info("User already exists with email: {}", email)
-            } else {
-                User(
-                    email = "admin@gmail.com",
-                    password = hashService.hashBcrypt("123456"),
-                    roles = setOf(Role.ROLE_ADMIN)
-                ).let { userRepository.save(it) }
-            }
+        } ?: run {
+            User(
+                email = "admin@gmail.com",
+                password = hashService.hashBcrypt("123456"),
+                roles = setOf(Role.ROLE_ADMIN)
+            ).let { userRepository.save(it) }
         }
     }
 }

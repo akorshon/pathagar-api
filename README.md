@@ -20,3 +20,8 @@
 * Run `docker-compose up -d` to start the database
 * Run `./gradlew bootRun` to start the application
 
+## How to test
+
+## How to deploy
+`gradle clean build`
+
