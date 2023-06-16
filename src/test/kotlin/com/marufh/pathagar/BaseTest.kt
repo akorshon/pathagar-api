@@ -1,6 +1,7 @@
 package com.marufh.pathagar
 
 import com.marufh.pathagar.author.dto.AuthorDto
+import com.marufh.pathagar.author.dto.AuthorMapper
 import com.marufh.pathagar.author.repository.AuthorRepository
 import com.marufh.pathagar.author.service.AuthorService
 import com.marufh.pathagar.book.dto.BookDto
@@ -22,6 +23,9 @@ class BaseTest {
 
     @Autowired
     lateinit var bookMapper: BookMapper
+
+    @Autowired
+    lateinit var authMapper: AuthorMapper
 
     @Autowired
     lateinit var bookService: BookService

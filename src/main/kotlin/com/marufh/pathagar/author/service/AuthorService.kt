@@ -47,6 +47,7 @@ class AuthorService(
         return authorRepository.save(author).run { authorMapper.toDto(this) }
     }
 
+    @Transactional
     fun findById(id: String): AuthorDto {
         logger.info("Finding author by id: $id")
 
@@ -55,6 +56,7 @@ class AuthorService(
             .orElseThrow { NotFoundException("Author not found with id: $id") }
     }
 
+    @Transactional
     fun getAuthorDetails(id: String): AuthorDto {
         logger.info("Getting author details $id")
 
@@ -65,6 +67,7 @@ class AuthorService(
         }
     }
 
+    @Transactional
     fun findAll(search: String?,  pageable: Pageable): Page<AuthorDto> {
         logger.info("Finding all authors")
 
