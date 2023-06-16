@@ -1,10 +1,12 @@
 package com.marufh.pathagar.book.service
 
 import com.marufh.pathagar.BaseTest
-import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.entity.Book
-import com.marufh.pathagar.file.entity.FileType
+import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import java.util.*
 
 
@@ -13,74 +15,140 @@ class BookServiceTest: BaseTest() {
     @Test
     fun `test create book`() {
         logger.info("Testing create book")
-        val bookDto = BookDto(
-            name = "Test Book",
-            description = "Test Book Description",
-            filePath = "test.pdf",
-            hash = "test-hash",
-            size = 100,
-            fileType = FileType.BOOK,
-            totalPage = 100,
-            coverImage = "test-cover-image",
-            coverImagePage = 1,
-            deleted = false
-        )
 
-        val book = bookService.create(bookDto);
-        assert(book.id != null)
-        assert(book.name == bookDto.name)
-        assert(book.description == bookDto.description)
-        assert(book.filePath == bookDto.filePath)
-        assert(book.hash == bookDto.hash)
-        assert(book.size == bookDto.size)
-        assert(book.fileType == bookDto.fileType)
-        assert(book.totalPage == bookDto.totalPage)
-        assert(book.coverImage == bookDto.coverImage)
-        assert(book.coverImagePage == bookDto.coverImagePage)
-        assert(book.deleted == bookDto.deleted)
+        // Given
+        val bookDto = getBookDto();
+
+        // When
+        bookService.create(bookDto).apply {
+
+            // Then
+            assert(id != null)
+            assert(name == bookDto.name)
+            assert(description == bookDto.description)
+            assert(filePath == bookDto.filePath)
+            assert(hash == bookDto.hash)
+            assert(size == bookDto.size)
+            assert(fileType == bookDto.fileType)
+            assert(totalPage == bookDto.totalPage)
+            assert(coverImage == bookDto.coverImage)
+            assert(coverImagePage == bookDto.coverImagePage)
+            assert(deleted == bookDto.deleted)
+        }
+    }
+
+    @Test
+    fun `test update  book`() {
+        logger.info("Testing create book")
+
+        // Given
+        val bookDto = bookService.create(getBookDto())
+        bookDto.name = "Updated Book Name" + UUID.randomUUID().toString()
+        bookDto.description = "Updated Book Description"
+
+        // When
+        bookService.update(bookDto).apply {
+
+            // Then
+            assert(id != null)
+            assert(name == bookDto.name)
+            assert(description == bookDto.description)
+            assert(filePath == bookDto.filePath)
+            assert(hash == bookDto.hash)
+            assert(size == bookDto.size)
+            assert(fileType == bookDto.fileType)
+            assert(totalPage == bookDto.totalPage)
+            assert(coverImage == bookDto.coverImage)
+            assert(coverImagePage == bookDto.coverImagePage)
+            assert(deleted == bookDto.deleted)
+        }
     }
 
     @Test
     fun `test book find by id`() {
         logger.info("Testing update book")
 
-        var book = Book(
-            name = "Test Book" + UUID.randomUUID().toString(),
-            description = "Test Book Description",
-            filePath = "test.pdf",
-            hash = "test-hash",
-            size = 100,
-            fileType = FileType.BOOK,
-            totalPage = 100,
-            coverImage = "test-cover-image",
-            coverImagePage = 1,
-            deleted = false
-        )
-        book = bookRepository.save(book)
+        // Given
+        val book = bookService.create(getBookDto())
 
+        //
+        bookService.findById(book.id!!).apply {
 
-        bookService.findById(book.id!!).let {
-            assert(it.id == book.id)
-            assert(it.name == book.name)
-            assert(it.description == book.description)
-            assert(it.filePath == book.filePath)
-            assert(it.hash == book.hash)
-            assert(it.size == book.size)
-            assert(it.fileType == book.fileType)
-            assert(it.totalPage == book.totalPage)
-            assert(it.coverImage == book.coverImage)
-            assert(it.coverImagePage == book.coverImagePage)
-            assert(it.deleted == book.deleted)
+            // Then
+            assert(id == book.id)
+            assert(name == book.name)
+            assert(description == book.description)
+            assert(filePath == book.filePath)
+            assert(hash == book.hash)
+            assert(size == book.size)
+            assert(fileType == book.fileType)
+            assert(totalPage == book.totalPage)
+            assert(coverImage == book.coverImage)
+            assert(coverImagePage == book.coverImagePage)
+            assert(deleted == book.deleted)
         }
+    }
+
+    @Test
+    fun `test book find by id not found`() {
+        assertThrows<EntityNotFoundException> {
+            bookService.findById("id-not-exist")
+        }
+    }
+
+    @Test
+    fun `test find all`() {
+        logger.info("Testing find all book")
+
+        // Given
+        bookRepository.deleteAll();
+        val bookList = listOf<Book>(
+            bookMapper.toEntity(getBookDto()),
+            bookMapper.toEntity(getBookDto()),
+            bookMapper.toEntity(getBookDto()),
+            bookMapper.toEntity(getBookDto()),
+            bookMapper.toEntity(getBookDto()),
+        )
+        bookRepository.saveAll(bookList)
+
+        // When
+        val result = bookService.findAll("", PageRequest.of(0, 10))
+
+        // Then
+        assert(result is PageImpl)
+        assert(result.totalPages == 1)
+        assert(result.content.size == 5)
+
     }
 
     @Test
     fun `test update author`() {
         logger.info("Testing update author")
+
+        // Given
+        var book = bookService.create(getBookDto());
+        val author = authorService.create(getAuthorDto())
+
+        // When
+        book = bookService.updateAuthor(book.id!!, author.id!!, "add")
+
+        // Then
+        assert(book.authors?.size   == 1)
     }
 
     @Test
     fun `test delete book`() {
         logger.info("Testing delete book")
+
+        // Given
+        val book = bookService.create(getBookDto());
+
+        // When
+        bookService.delete(book.id!!)
+
+        // Then
+        assertThrows<EntityNotFoundException> {
+            bookService.findById(book.id!!)
+        }
     }
 }

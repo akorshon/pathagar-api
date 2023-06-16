@@ -4,6 +4,7 @@ import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.author.repository.AuthorRepository
+import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.exception.AlreadyExistException
 import com.marufh.pathagar.file.service.PdfService
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -19,30 +21,20 @@ import java.nio.file.Path
 class BookService(
     private val bookRepository: BookRepository,
     private val fileProperties: FileProperties,
+    private val bookMapper: BookMapper,
     private val authorRepository: AuthorRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun create(bookDto: BookDto): Book {
+    fun create(bookDto: BookDto): BookDto {
         logger.info("Creating book: ${bookDto.name}")
-
-        val book = Book(
-            name = bookDto.name,
-            description = bookDto.description,
-            filePath = bookDto.filePath,
-            hash = bookDto.hash,
-            size = bookDto.size,
-            fileType = bookDto.fileType,
-            totalPage = bookDto.totalPage,
-            coverImage = bookDto.coverImage,
-            coverImagePage = bookDto.coverImagePage,
-            deleted = bookDto.deleted,
-
-        )
-        return bookRepository.save(book)
+        bookMapper.toEntity(bookDto).run {
+            return bookMapper.toDto(bookRepository.save(this))
+        }
     }
 
-    fun update(bookDto: BookDto): Book {
+    @Transactional
+    fun update(bookDto: BookDto): BookDto {
         logger.info("Updating book: ${bookDto.name}")
 
         val book = bookRepository.findById(bookDto.id!!)
@@ -50,10 +42,20 @@ class BookService(
 
         book.name = bookDto.name
         book.description = bookDto.description
-        return bookRepository.save(book)
+        return bookRepository.save(book).run { bookMapper.toDto(this) }
     }
 
-    fun updateAuthor(bookId: String, authorId: String, action: String): Book {
+    @Transactional
+    fun findById(id: String): BookDto {
+        logger.info("Finding book: $id")
+
+        return bookRepository.findById(id)
+            .map { bookMapper.toDto(it) }
+            .orElseThrow { EntityNotFoundException("Book not found with id: $id") }
+    }
+
+    @Transactional
+    fun updateAuthor(bookId: String, authorId: String, action: String): BookDto {
         logger.info("Updating book: $bookId, author: $authorId, action: $action")
 
         val book = bookRepository.findById(bookId)
@@ -62,28 +64,24 @@ class BookService(
         val author = authorRepository.findById(authorId)
             .orElseThrow { EntityNotFoundException("Author not found with id: $authorId") }
 
-        if(action == "add") {
-            println("bookId: $bookId, authorId: $authorId, action: $action")
-            book.authors.add(author)
-        } else {
-            println("bookId: $bookId, authorId: $authorId, action: $action")
-            book.authors.remove(author)
+        if(action == AuthorAction.ADD.action) {
+            logger.info("Adding bookId: $bookId, authorId: $authorId, action: $action")
+            book.authors?.add(author)
+        } else if(action == AuthorAction.REMOVE.action){
+            logger.info("Removing bookId: $bookId, authorId: $authorId, action: $action")
+            book.authors?.remove(author)
         }
 
-        return bookRepository.save(book)
+        return bookRepository.save(book).let { bookMapper.toDto(it) }
     }
 
-    fun findById(id: String): Book {
-        logger.info("Finding book: $id")
 
-        return bookRepository.findById(id)
-            .orElseThrow { EntityNotFoundException("Book not found with id: $id") }
-    }
-
-    fun findAll(search: String?, pageable: Pageable): Page<Book> {
+    @Transactional
+    fun findAll(search: String?, pageable: Pageable): Page<BookDto> {
         logger.info("Finding all books")
 
         return bookRepository.findAll(search, pageable)
+            .map { bookMapper.toDto(it) }
     }
 
     fun delete(id: String) {

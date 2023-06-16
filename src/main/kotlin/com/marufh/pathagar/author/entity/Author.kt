@@ -29,7 +29,7 @@ class Author(
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "authors")
-    var books: Set<Book> = mutableSetOf(),
+    var books: Set<Book>? = mutableSetOf(),
 
     ): BaseEntity()
 
