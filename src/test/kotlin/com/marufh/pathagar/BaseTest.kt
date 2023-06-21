@@ -11,6 +11,7 @@ import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.service.BookService
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.service.FileDownloadService
 import com.marufh.pathagar.file.service.FileUploadService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -49,6 +50,9 @@ class BaseTest {
 
     @Autowired
     lateinit var fileUploadService: FileUploadService
+
+    @Autowired
+    lateinit var fileDownloadService: FileDownloadService
 
     @Autowired
     lateinit var authorRepository: AuthorRepository
