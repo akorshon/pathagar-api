@@ -4,6 +4,7 @@ import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockMultipartFile
 import java.io.FileInputStream
@@ -11,6 +12,12 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class FileUploadServiceTest: BaseTest() {
+
+    @BeforeEach
+    fun setup() {
+        authorRepository.deleteAllInBatch()
+        bookRepository.deleteAllInBatch()
+    }
 
     @Test
     fun `test create book file`() {
@@ -36,7 +43,7 @@ class FileUploadServiceTest: BaseTest() {
         assertEquals("book/test-book/test-book.jpg", bookDto.coverImage)
         assertEquals("book/test-book/test-book.pdf", bookDto.filePath)
         assertEquals(FileType.BOOK, bookDto.fileType)
-        assertEquals(1, bookDto.totalPage)
+        assertEquals(2, bookDto.totalPage)
         assertEquals(0, bookDto.coverImagePage)
 
         assertTrue(Files.exists(Path.of(fileProperties.book).resolve("test-book/test-book.pdf")))

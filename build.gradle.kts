@@ -34,7 +34,6 @@ dependencies {
 	implementation("com.github.jai-imageio:jai-imageio-core:1.4.0")
 	implementation("com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0")
 	implementation("org.mapstruct:mapstruct:1.5.2.Final")
-	//implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
 

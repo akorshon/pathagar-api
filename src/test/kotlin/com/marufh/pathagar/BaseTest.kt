@@ -14,6 +14,7 @@ import com.marufh.pathagar.file.entity.FileType
 import com.marufh.pathagar.file.service.FileDownloadService
 import com.marufh.pathagar.file.service.FileUploadService
 import com.marufh.pathagar.file.service.ImageResizeService
+import com.marufh.pathagar.file.service.PdfService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -63,6 +64,9 @@ class BaseTest {
 
     @Autowired
     lateinit var imageResizeService: ImageResizeService
+
+    @Autowired
+    lateinit var pdfService: PdfService
 
     @Autowired
     lateinit var fileProperties: FileProperties
