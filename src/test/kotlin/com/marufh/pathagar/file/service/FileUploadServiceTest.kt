@@ -70,47 +70,4 @@ class FileUploadServiceTest: BaseTest() {
 
     }
 
-    @Test
-    fun `test update book file`() {
-        logger.info("Testing upload author file")
-
-    }
-
-    @Test
-    fun `test update author file`() {
-        logger.info("Testing update author file")
-
-    }
-
-    @Test
-    fun `test create book file with invalid file`() {
-        logger.info("Testing upload book file with invalid file")
-
-    }
-
-
-    @Test
-    fun `test create author file with invalid file`() {
-        logger.info("Testing upload author file with invalid file")
-
-    }
-
-    @Test
-    fun `test create book file with invalid file type`() {
-        logger.info("Testing upload book file with invalid file type")
-
-    }
-
-    @Test
-    fun `test create author file with invalid file type`() {
-        logger.info("Testing upload author file with invalid file type")
-
-    }
-
-    @Test
-    fun `test update thumb `() {
-        logger.info("Testing update thumb")
-
-    }
-
 }
