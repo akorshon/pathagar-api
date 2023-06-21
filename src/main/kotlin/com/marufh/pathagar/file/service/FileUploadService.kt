@@ -40,10 +40,12 @@ class FileUploadService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    private val fileNameRegex = "\\.[^/.]+$"
+
     fun createBookFile(fileDto: FileDto): BookDto  {
         logger.info("Uploading book file: ${fileDto.file.originalFilename}")
 
-        val name =  fileDto.file.originalFilename?.replace("\\.[^/.]+$".toRegex(), "")?.replace("_".toRegex(), " ")
+        val name =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_".toRegex(), " ")
         val filePath = upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
         val file = filePath.toFile()
         val hash = getHash(file)
@@ -108,7 +110,7 @@ class FileUploadService(
     fun createAuthorFile(fileDto: FileDto): AuthorDto  {
         logger.info("Uploading author file: ${fileDto.file.originalFilename}")
 
-        val authorName =  fileDto.file.originalFilename?.replace("\\.[^/.]+$".toRegex(), "")?.replace("_", " ")
+        val authorName =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_", " ")
         val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
         val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
 
@@ -125,7 +127,7 @@ class FileUploadService(
     fun updateUploadAuthor(id: String, fileDto: FileDto): AuthorDto  {
         logger.info("Uploading author file: ${fileDto.file.originalFilename}")
 
-        val authorName =  fileDto.file.originalFilename?.replace("\\.[^/.]+$".toRegex(), "")?.replace("_", " ")
+        val authorName =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_", " ")
         val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
         val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
 
