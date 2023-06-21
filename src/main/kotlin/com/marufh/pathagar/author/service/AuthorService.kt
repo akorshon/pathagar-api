@@ -82,9 +82,9 @@ class AuthorService(
             .orElseThrow{ NotFoundException("Author not found with id: $id") }
 
         try {
-            Files.delete(Path.of(fileProperties.base +"/"+ author.image))
-            Files.delete(Path.of(fileProperties.base +"/"+ author.thumbnail))
-            Files.delete(Path.of(fileProperties.base +"/"+ author.image).parent)
+            Files.delete(Path.of(fileProperties.base +"/"+ author.imagePath))
+            Files.delete(Path.of(fileProperties.base +"/"+ author.thumbnailPath))
+            Files.delete(Path.of(fileProperties.base +"/"+ author.imagePath).parent)
         } catch (e: Exception) {
             println("Error deleting file: ${e.message}")
         } finally {

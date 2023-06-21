@@ -34,9 +34,9 @@ dependencies {
 	implementation("com.github.jai-imageio:jai-imageio-core:1.4.0")
 	implementation("com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0")
 	implementation("org.mapstruct:mapstruct:1.5.2.Final")
-	runtimeOnly("com.mysql:mysql-connector-j")
+	//implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	kapt("org.mapstruct:mapstruct-processor:1.5.2.Final")
+	runtimeOnly("com.mysql:mysql-connector-j")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
@@ -48,6 +48,7 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
+	kapt("org.mapstruct:mapstruct-processor:1.5.2.Final")
 }
 
 tasks.withType<KotlinCompile> {

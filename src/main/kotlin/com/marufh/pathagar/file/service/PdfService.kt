@@ -1,21 +1,15 @@
 package com.marufh.pathagar.file.service
 
-import com.marufh.pathagar.book.repository.UserBookRepository
-import com.marufh.pathagar.config.FileProperties
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.rendering.PDFRenderer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.awt.Dimension
-import java.awt.Image
-import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.file.Path
-import javax.imageio.ImageIO
 
 
 @Service
-class PdfService(private val imageService: ImageService) {
+class PdfService(private val imageResizeService: ImageResizeService) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -37,7 +31,7 @@ class PdfService(private val imageService: ImageService) {
             val pd = PDDocument.load(file)
             val bi = PDFRenderer(PDDocument.load(file)).renderImageWithDPI(page, 300f)
             bookThumb = path.resolve(file.nameWithoutExtension + ".jpg")
-            imageService.resizeImage(bi, bookThumb.toFile(), 200, 300)
+            imageResizeService.resize(bi, bookThumb.toFile(), 200, 300)
             pd.close()
         } catch (ex: Exception) {
             logger.error("Fail to convert pdf thumb: $filePath")

@@ -2,7 +2,7 @@ package com.marufh.pathagar.author.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.marufh.pathagar.book.entity.Book
-import com.marufh.pathagar.base.BaseEntity
+import com.marufh.pathagar.base.entity.BaseEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -21,11 +21,11 @@ class Author(
     @Column(name = "description", length = 2048)
     var description: String? = null,
 
-    @Column(name = "thumbnail", length = 512)
-    var thumbnail: String? = null,
+    @Column(name = "thumbnailPath", length = 512)
+    var thumbnailPath: String? = null,
 
-    @Column(name = "image", length = 512)
-    var image: String? = null,
+    @Column(name = "image_path", length = 512)
+    var imagePath: String? = null,
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "authors")

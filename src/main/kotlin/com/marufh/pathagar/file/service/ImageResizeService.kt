@@ -1,5 +1,6 @@
 package com.marufh.pathagar.file.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.awt.Dimension
 import java.awt.Image
@@ -9,11 +10,14 @@ import java.nio.file.Path
 import javax.imageio.ImageIO
 
 @Service
-class ImageService {
+class ImageResizeService {
 
-    fun resizeImage(bi: BufferedImage, file: File, width: Int, height: Int): Path {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
+    fun resize(bi: BufferedImage, file: File, width: Int, height: Int): Path {
+        logger.info("Resizing image: ${file.name}")
+
         val img = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-
         val imgSize = Dimension(bi.width, bi.height)
         val boundary = Dimension(width, height)
         val dimension = getScaledDimension(imgSize, boundary)

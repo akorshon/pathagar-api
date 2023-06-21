@@ -1,8 +1,7 @@
 package com.marufh.pathagar.book.entity
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.marufh.pathagar.author.entity.Author
-import com.marufh.pathagar.base.BaseEntity
+import com.marufh.pathagar.base.entity.BaseEntity
 import com.marufh.pathagar.file.entity.FileType
 import jakarta.persistence.*
 

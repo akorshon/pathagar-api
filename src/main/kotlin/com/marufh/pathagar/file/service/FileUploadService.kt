@@ -1,7 +1,6 @@
 package com.marufh.pathagar.file.service
 
 import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.author.entity.Author
 import com.marufh.pathagar.author.service.AuthorService
 import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookMapper
@@ -32,7 +31,7 @@ import javax.imageio.ImageIO
 @Service
 class FileUploadService(
     private val bookService: BookService,
-    private val imageService: ImageService,
+    private val imageResizeService: ImageResizeService,
     private val authorService: AuthorService,
     private val bookRepository: BookRepository,
     private val bookMapper: BookMapper,
@@ -41,7 +40,7 @@ class FileUploadService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun uploadBook(fileDto: FileDto): BookDto  {
+    fun createBookFile(fileDto: FileDto): BookDto  {
         logger.info("Uploading book file: ${fileDto.file.originalFilename}")
 
         val name =  fileDto.file.originalFilename?.replace("\\.[^/.]+$".toRegex(), "")?.replace("_".toRegex(), " ")
@@ -73,7 +72,7 @@ class FileUploadService(
         return bookService.create(book)
     }
 
-    fun updateBook(id: String, multipartFile: MultipartFile): BookDto  {
+    fun updateBookFile(id: String, multipartFile: MultipartFile): BookDto  {
         logger.info("Updating book file: ${multipartFile.originalFilename}")
 
         val book = bookRepository.findById(id)
@@ -106,18 +105,18 @@ class FileUploadService(
         return bookRepository.save(book).let { bookMapper.toDto(it) }
     }
 
-    fun uploadAuthor(fileDto: FileDto): AuthorDto  {
+    fun createAuthorFile(fileDto: FileDto): AuthorDto  {
         logger.info("Uploading author file: ${fileDto.file.originalFilename}")
 
         val authorName =  fileDto.file.originalFilename?.replace("\\.[^/.]+$".toRegex(), "")?.replace("_", " ")
         val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageService.resizeImage(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
 
         val authorDto = AuthorDto(
             name = authorName!!,
             description = "",
-            image = getRelativePath(image),
-            thumbnail = getRelativePath(thumbnail),
+            imagePath = getRelativePath(image),
+            thumbnailPath = getRelativePath(thumbnail),
         )
 
         return authorService.create(authorDto)
@@ -128,13 +127,13 @@ class FileUploadService(
 
         val authorName =  fileDto.file.originalFilename?.replace("\\.[^/.]+$".toRegex(), "")?.replace("_", " ")
         val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageService.resizeImage(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
 
         val authorDto = AuthorDto(
             name = authorName!!,
             description = "",
-            image = getRelativePath(image),
-            thumbnail = getRelativePath(thumbnail),
+            imagePath = getRelativePath(image),
+            thumbnailPath = getRelativePath(thumbnail),
         )
 
         return authorService.create(authorDto)

@@ -16,13 +16,13 @@ import org.springframework.web.multipart.MultipartFile
 class FileAdminController(private val fileUploadService: FileUploadService) {
 
     @PostMapping("/book")
-    fun uploadBook(@ModelAttribute fileDto: FileDto) = fileUploadService.uploadBook(fileDto)
+    fun uploadBook(@ModelAttribute fileDto: FileDto) = fileUploadService.createBookFile(fileDto)
 
     @PutMapping("/book/{id}")
-    fun updateBook(@PathVariable id: String,  @RequestParam("file") multipartFile: MultipartFile) = fileUploadService.updateBook(id, multipartFile)
+    fun updateBook(@PathVariable id: String,  @RequestParam("file") multipartFile: MultipartFile) = fileUploadService.updateBookFile(id, multipartFile)
 
     @PostMapping("/author")
-    fun uploadAuthor(@ModelAttribute fileDto: FileDto) = fileUploadService.uploadAuthor(fileDto)
+    fun uploadAuthor(@ModelAttribute fileDto: FileDto) = fileUploadService.createAuthorFile(fileDto)
 
     @PutMapping("/author/{id}")
     fun updateAuthor(@PathVariable id: String, @ModelAttribute fileDto: FileDto) = fileUploadService.updateUploadAuthor(id, fileDto)

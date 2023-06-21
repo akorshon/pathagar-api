@@ -6,8 +6,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/user/authors")
+@RequestMapping(AuthorController.AUTHOR_API)
 class AuthorController(val authorService: AuthorService) {
+
+    companion object {
+        const val AUTHOR_API = "/api/user/authors"
+    }
 
     @GetMapping("/{id}")
     fun getAuthorDetails(@PathVariable id: String) = ResponseEntity.ok(authorService.getAuthorDetails(id))

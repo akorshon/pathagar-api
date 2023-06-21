@@ -1,6 +1,6 @@
 package com.marufh.pathagar.book.entity
 
-import com.marufh.pathagar.base.BaseEntity
+import com.marufh.pathagar.base.entity.BaseEntity
 import jakarta.persistence.*
 import java.time.Instant
 

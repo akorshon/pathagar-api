@@ -1,4 +1,4 @@
-package com.marufh.pathagar.base
+package com.marufh.pathagar.base.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.GeneratedValue

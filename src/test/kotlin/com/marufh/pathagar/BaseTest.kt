@@ -1,5 +1,6 @@
 package com.marufh.pathagar
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.marufh.pathagar.author.dto.AuthorDto
 import com.marufh.pathagar.author.dto.AuthorMapper
 import com.marufh.pathagar.author.repository.AuthorRepository
@@ -8,18 +9,28 @@ import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.service.BookService
+import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.service.FileUploadService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.web.servlet.MockMvc
 import java.util.*
 
+
 @SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 class BaseTest {
 
     val logger = LoggerFactory.getLogger(javaClass)
+
+    @Autowired
+    lateinit var mockMvc: MockMvc
 
     @Autowired
     lateinit var bookMapper: BookMapper
@@ -28,17 +39,26 @@ class BaseTest {
     lateinit var authMapper: AuthorMapper
 
     @Autowired
-    lateinit var bookService: BookService
+    lateinit var objectMapper: ObjectMapper
 
     @Autowired
-    lateinit var authorRepository: AuthorRepository
+    lateinit var bookService: BookService
 
     @Autowired
     lateinit var authorService: AuthorService
 
     @Autowired
+    lateinit var fileUploadService: FileUploadService
+
+    @Autowired
+    lateinit var authorRepository: AuthorRepository
+
+    @Autowired
     lateinit var bookRepository: BookRepository
 
+
+    @Autowired
+    lateinit var fileProperties: FileProperties
 
     fun getAuthorDto(): AuthorDto {
         return AuthorDto(
@@ -61,5 +81,9 @@ class BaseTest {
             coverImagePage = 1,
             deleted = false
         )
+    }
+
+    fun uploadFile() {
+
     }
 }

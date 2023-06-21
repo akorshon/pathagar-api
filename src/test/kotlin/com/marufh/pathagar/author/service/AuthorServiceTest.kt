@@ -1,4 +1,4 @@
-package com.marufh.pathagar.author
+package com.marufh.pathagar.author.service
 
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.exception.NotFoundException
@@ -115,6 +115,22 @@ class AuthorServiceTest: BaseTest() {
 
         authorService.getAuthorDetails(author.id!!).apply {
             assert(books?.size == 2)
+        }
+    }
+
+    @Test
+    fun `test delete author`() {
+        logger.info("Testing delete author")
+
+        // Given
+        val authorDto = authorService.create(getAuthorDto())
+
+        // When
+        authorService.delete(authorDto.id!!)
+
+        // Then
+        assertThrows<NotFoundException> {
+            authorService.findById(authorDto.id!!)
         }
     }
 }
