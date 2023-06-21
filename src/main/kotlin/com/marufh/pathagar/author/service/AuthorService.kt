@@ -2,9 +2,7 @@ package com.marufh.pathagar.author.service
 
 import com.marufh.pathagar.author.dto.AuthorDto
 import com.marufh.pathagar.author.dto.AuthorMapper
-import com.marufh.pathagar.author.entity.Author
 import com.marufh.pathagar.author.repository.AuthorRepository
-import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.config.FileProperties

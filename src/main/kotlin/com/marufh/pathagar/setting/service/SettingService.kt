@@ -25,19 +25,16 @@ class SettingService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun generateHash() {
-
-        logger.info("=========================================")
         logger.info("Generating hash is started ")
-        logger.info("=========================================")
 
         var pageRequest = PageRequest.of(0, 500)
         var onePage: Page<Book> = bookRepository.findAll(pageRequest)
         while (!onePage.isEmpty()) {
             pageRequest = pageRequest.next()
             for (book in onePage.getContent()) {
-                /*if (book.hash != null) {
+                if (book.hash != null) {
                     continue
-                }*/
+                }
                 logger.info("Generating hash for: {}", book.name)
                 try {
                     val file = File(fileProperties.base +"/"+ book.filePath)
@@ -56,9 +53,7 @@ class SettingService(
             }
             onePage = bookRepository.findAll(pageRequest)
         }
-        logger.info("=========================================")
         logger.info("Generating hash is finished")
-        logger.info("=========================================")
     }
 
     companion object {

@@ -1,13 +1,10 @@
 package com.marufh.pathagar.book.service
 
-import com.marufh.pathagar.config.FileProperties
-import com.marufh.pathagar.book.dto.BookDto
-import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.author.repository.AuthorRepository
+import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
-import com.marufh.pathagar.exception.AlreadyExistException
-import com.marufh.pathagar.file.service.PdfService
+import com.marufh.pathagar.config.FileProperties
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page

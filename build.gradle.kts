@@ -3,10 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "3.0.6"
 	id("io.spring.dependency-management") version "1.1.0"
+	id ("org.sonarqube") version "4.2.1.3168"
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 	kotlin("plugin.jpa") version "1.7.22"
 	kotlin("kapt") version "1.6.21"
+
 }
 
 group = "com.marufh"
@@ -65,3 +67,11 @@ tasks.bootRun {
 	args("--spring.profiles.active=dev")
 }
 
+
+sonarqube {
+	properties {
+		property "sonar.projectKey", "akorshon_pathagar-api"
+		property "sonar.organization", "akorshon"
+		property "sonar.host.url", "https://sonarcloud.io"
+	}
+}
