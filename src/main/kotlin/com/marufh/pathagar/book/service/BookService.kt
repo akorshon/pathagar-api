@@ -4,6 +4,7 @@ import com.marufh.pathagar.author.repository.AuthorRepository
 import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
+import com.marufh.pathagar.category.CategoryRepository
 import com.marufh.pathagar.config.FileProperties
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
@@ -19,6 +20,7 @@ class BookService(
     private val bookRepository: BookRepository,
     private val fileProperties: FileProperties,
     private val bookMapper: BookMapper,
+    private val categoryRepository: CategoryRepository,
     private val authorRepository: AuthorRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -74,6 +76,28 @@ class BookService(
 
 
     @Transactional
+    fun updateCategory(bookId: String, categoryId: String, action: String): BookDto {
+        logger.info("Updating book: $bookId, category: $categoryId, action: $action")
+
+        val book = bookRepository.findById(bookId)
+            .orElseThrow { EntityNotFoundException("Book not found with id: $bookId") }
+
+        val category = categoryRepository.findById(categoryId)
+            .orElseThrow { EntityNotFoundException("Author not found with id: $categoryId") }
+
+        if(action == AuthorAction.ADD.action) {
+            logger.info("Adding bookId: $bookId, categoryId: $categoryId, action: $action")
+            book.categories?.add(category)
+        } else if(action == AuthorAction.REMOVE.action){
+            logger.info("Removing bookId: $bookId, categoryId: $categoryId, action: $action")
+            book.categories?.remove(category)
+        }
+
+        return bookRepository.save(book).let { bookMapper.toDto(it) }
+    }
+
+
+    @Transactional
     fun findAll(search: String?, pageable: Pageable): Page<BookDto> {
         logger.info("Finding all books")
 
@@ -92,7 +116,7 @@ class BookService(
             Files.delete(Path.of(fileProperties.base +"/"+ book.coverImage))
             Files.delete(Path.of(fileProperties.base +"/"+ book.filePath).parent)
         } catch (e: Exception) {
-            println("Error deleting file: ${e.message}")
+            logger.info("Error deleting file: ${e.message}")
         } finally {
             bookRepository.delete(book);
         }

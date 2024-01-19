@@ -33,9 +33,10 @@ class AuthController(
     @PostMapping("/registration")
     fun register(@RequestBody login: LoginDto): TokenDto {
 
-        val user = userService.findByEmail(login.email)
-        if (user != null) {
-            throw NotFoundException("User already exists")
+        userService.findByEmail(login.email).let {
+            if (it != null) {
+                throw NotFoundException("User already exists")
+            }
         }
         val newUser = userService.save(User(login.email, hashService.hashBcrypt(login.password), setOf(Role.ROLE_USER)))
         return TokenDto(tokenService.generateToken(newUser))

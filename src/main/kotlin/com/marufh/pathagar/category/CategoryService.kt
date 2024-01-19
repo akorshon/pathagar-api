@@ -1,8 +1,5 @@
-package com.marufh.pathagar.author.service
+package com.marufh.pathagar.category
 
-import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.author.dto.AuthorMapper
-import com.marufh.pathagar.author.repository.AuthorRepository
 import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.config.FileProperties
@@ -17,66 +14,66 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 @Service
-class AuthorService(
+class CategoryService(
     private val bookRepository: BookRepository,
     private val fileProperties: FileProperties,
-    private val authorMapper: AuthorMapper,
+    private val categoryMapper: CategoryMapper,
     private val bookMapper: BookMapper,
-    private val authorRepository: AuthorRepository) {
+    private val categoryRepository: CategoryRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun create(authorDto: AuthorDto): AuthorDto {
-        logger.info("Creating author: ${authorDto.name}")
+    fun create(categoryDto: CategoryDto): CategoryDto {
+        logger.info("Creating author: ${categoryDto.name}")
 
-        authorMapper.toEntity(authorDto).run {
-            return authorMapper.toDto(authorRepository.save(this))
+        categoryMapper.toEntity(categoryDto).run {
+            return categoryMapper.toDto(categoryRepository.save(this))
         }
     }
 
     @Transactional
-    fun update(authorDto: AuthorDto): AuthorDto {
-        logger.info("Updating author: ${authorDto.name}")
+    fun update(categoryDto: CategoryDto): CategoryDto {
+        logger.info("Updating author {}:", categoryDto.name)
 
-        val author = authorRepository.findById(authorDto.id!!)
-            .orElseThrow { EntityNotFoundException("Author not found with id: ${authorDto.id}") }
-        author.name = authorDto.name
-        author.description = authorDto.description
-        return authorRepository.save(author).run { authorMapper.toDto(this) }
+        val author = categoryRepository.findById(categoryDto.id!!)
+            .orElseThrow { EntityNotFoundException("Author not found with id: ${categoryDto.id}") }
+        author.name = categoryDto.name
+        author.description = categoryDto.description
+        return categoryRepository.save(author).run { categoryMapper.toDto(this) }
     }
 
     @Transactional
-    fun findById(id: String): AuthorDto {
+    fun findById(id: String): CategoryDto {
         logger.info("Finding author by id: $id")
 
-        return authorRepository.findById(id)
-            .map {authorMapper.toDto(it) }
+        return categoryRepository.findById(id)
+            .map {categoryMapper.toDto(it) }
             .orElseThrow { NotFoundException("Author not found with id: $id") }
     }
 
     @Transactional
-    fun getAuthorDetails(id: String): AuthorDto {
+    fun getDetails(id: String): CategoryDto {
         logger.info("Getting author details $id")
 
         return findById(id).apply {
-            books = bookRepository.findByAuthorId(id)
+            books = bookRepository.findByCategoryId(id)
                 .map { bookMapper.toDto(it) }
                 .toList()
         }
     }
 
     @Transactional
-    fun findAll(search: String?,  pageable: Pageable): Page<AuthorDto> {
-        logger.info("Finding all authors")
+    fun findAll(search: String?,  pageable: Pageable): Page<CategoryDto> {
+        logger.info("Finding all categories")
 
-        return authorRepository.findAll(search, pageable)
-            .map { authorMapper.toDto(it) }
+        return categoryRepository.findAll(search, pageable)
+            .map { categoryMapper.toDto(it) }
     }
 
     fun delete(id: String) {
         logger.info("Deleting author by id: $id")
 
-        val author =  authorRepository.findById(id)
+        val author =  categoryRepository.findById(id)
             .orElseThrow{ NotFoundException("Author not found with id: $id") }
 
         try {
@@ -85,10 +82,10 @@ class AuthorService(
             Files.delete(Path.of(fileProperties.base +"/"+ author.thumbnailPath))
             Files.delete(Path.of(fileProperties.base +"/"+ author.imagePath).parent)
         } catch (e: Exception) {
-            logger.error("Error deleting file", e.message)
+            logger.error("Error deleting file: {}", e.message)
         } finally {
             logger.info("Deleting author from database")
-            authorRepository.delete(author);
+            categoryRepository.delete(author);
         }
     }
 

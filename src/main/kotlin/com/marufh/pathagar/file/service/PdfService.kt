@@ -24,7 +24,7 @@ class PdfService(private val imageResizeService: ImageResizeService) {
 
 
     fun convertToThumbFromPage(filePath: Path, path: Path, page: Int): Path {
-        logger.info("Converting pdf to thumb: $filePath, page: $page")
+        //logger.info("Converting pdf to thumb: $filePath, page: $page")
         var bookThumb: Path = path
         try {
             val file =  filePath.toFile()

@@ -2,6 +2,7 @@ package com.marufh.pathagar.book
 
 import com.marufh.pathagar.auth.config.toUser
 import com.marufh.pathagar.book.dto.UserBookDto
+import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.service.UserBookService
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.*
 class UserBookController(val userBookService: UserBookService) {
 
     @PostMapping
-    fun create(@RequestBody userBookDto: UserBookDto, authentication: Authentication) = userBookService.create(authentication.toUser(), userBookDto)
+    fun create(@RequestBody userBookDto: UserBookDto, authentication: Authentication): UserBook {
+        return userBookService.create(authentication.toUser(), userBookDto)
+    }
 
     @PutMapping
     fun update(@RequestBody userBookDto: UserBookDto, authentication: Authentication) = ResponseEntity.ok(userBookService.update(authentication.toUser(), userBookDto))

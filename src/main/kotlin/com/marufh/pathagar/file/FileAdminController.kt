@@ -1,5 +1,7 @@
 package com.marufh.pathagar.file
 
+import com.marufh.pathagar.book.dto.BookDto
+import com.marufh.pathagar.category.CategoryDto
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.service.FileUploadService
 import org.springframework.web.bind.annotation.ModelAttribute
@@ -19,11 +21,19 @@ class FileAdminController(private val fileUploadService: FileUploadService) {
     fun uploadBook(@ModelAttribute fileDto: FileDto) = fileUploadService.createBookFile(fileDto)
 
     @PutMapping("/book/{id}")
-    fun updateBook(@PathVariable id: String,  @RequestParam("file") multipartFile: MultipartFile) = fileUploadService.updateBookFile(id, multipartFile)
+    fun updateBook(@PathVariable id: String,  @RequestParam("file") multipartFile: MultipartFile): BookDto {
+      return fileUploadService.updateBookFile(id, multipartFile)
+    }
 
     @PostMapping("/author")
     fun uploadAuthor(@ModelAttribute fileDto: FileDto) = fileUploadService.createAuthorFile(fileDto)
 
     @PutMapping("/author/{id}")
     fun updateAuthor(@PathVariable id: String, @ModelAttribute fileDto: FileDto) = fileUploadService.updateUploadAuthor(id, fileDto)
+
+    @PostMapping("/category")
+    fun uploadCategory(@ModelAttribute fileDto: FileDto): CategoryDto {
+        return fileUploadService.createCategoryFile(fileDto)
+    }
+
 }

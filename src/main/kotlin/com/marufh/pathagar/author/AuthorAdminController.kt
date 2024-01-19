@@ -3,16 +3,17 @@ package com.marufh.pathagar.author
 import com.marufh.pathagar.author.dto.AuthorDto
 import com.marufh.pathagar.author.service.AuthorService
 import org.springframework.data.domain.Pageable
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/admin/authors")
-class AdminAuthorController(
+class AuthorAdminController(
     private val authorService: AuthorService) {
 
     @PostMapping
-    fun create(@RequestBody authorDto: AuthorDto) = authorService.create(authorDto)
+    fun create(@RequestBody authorDto: AuthorDto): AuthorDto {
+        return authorService.create(authorDto)
+    }
 
     @PutMapping
     fun update(@RequestBody authorDto: AuthorDto) = authorService.update(authorDto)

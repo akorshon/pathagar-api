@@ -8,7 +8,6 @@ plugins {
 	kotlin("plugin.spring") version "1.7.22"
 	kotlin("plugin.jpa") version "1.7.22"
 	kotlin("kapt") version "1.6.21"
-
 }
 
 group = "com.marufh"
@@ -67,11 +66,3 @@ tasks.bootRun {
 	args("--spring.profiles.active=dev")
 }
 
-
-sonarqube {
-	properties {
-		property "sonar.projectKey", "akorshon_pathagar-api"
-		property "sonar.organization", "akorshon"
-		property "sonar.host.url", "https://sonarcloud.io"
-	}
-}

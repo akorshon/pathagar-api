@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-class AuthorControllerTest: BaseTest() {
+class CategoryControllerTest: BaseTest() {
 
     @Test
     @WithMockUser(username = "user1", password = "pwd", roles = arrayOf("USER"))

@@ -1,6 +1,7 @@
 package com.marufh.pathagar.book.dto
 
 import com.marufh.pathagar.author.entity.Author
+import com.marufh.pathagar.category.Category
 import com.marufh.pathagar.file.entity.FileType
 
 data class BookDto(
@@ -16,4 +17,5 @@ data class BookDto(
     var coverImage: String? = null,
     var coverImagePage: Int? = null,
     var authors: Set<Author>? = null,
+    var categories: Set<Category>? = null,
 )

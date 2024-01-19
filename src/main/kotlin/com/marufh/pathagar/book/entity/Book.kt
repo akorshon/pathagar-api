@@ -1,7 +1,9 @@
 package com.marufh.pathagar.book.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.marufh.pathagar.author.entity.Author
 import com.marufh.pathagar.base.entity.BaseEntity
+import com.marufh.pathagar.category.Category
 import com.marufh.pathagar.file.entity.FileType
 import jakarta.persistence.*
 
@@ -43,5 +45,8 @@ class Book(
 
     @ManyToMany(fetch = FetchType.LAZY)
     var authors: MutableSet<Author>? = mutableSetOf(),
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    var categories: MutableSet<Category>? = mutableSetOf(),
 
 ): BaseEntity()

@@ -32,7 +32,7 @@ class FileUploadServiceTest: BaseTest() {
             "application/pdf",
             FileInputStream("src/test/resources/test-book.pdf")
         )
-        val fileDto = FileDto(mockFile, FileType.BOOK)
+        val fileDto = FileDto("file", mockFile, FileType.BOOK)
 
         // When
         val bookDto = fileUploadService.createBookFile(fileDto);
@@ -64,7 +64,7 @@ class FileUploadServiceTest: BaseTest() {
             "application/jpeg",
             FileInputStream("src/test/resources/test-author.jpg")
         )
-        val fileDto = FileDto(mockFile, FileType.AUTHOR_IMAGE)
+        val fileDto = FileDto("file", mockFile, FileType.AUTHOR_IMAGE)
 
         // When
         val authorDto = fileUploadService.createAuthorFile(fileDto);

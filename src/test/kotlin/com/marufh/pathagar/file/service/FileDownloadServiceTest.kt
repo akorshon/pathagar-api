@@ -3,10 +3,12 @@ package com.marufh.pathagar.file.service
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockMultipartFile
+import java.io.File
 import java.io.FileInputStream
 
 class FileDownloadServiceTest: BaseTest() {
@@ -27,7 +29,7 @@ class FileDownloadServiceTest: BaseTest() {
             "application/pdf",
             FileInputStream("src/test/resources/test-book.pdf")
         )
-        val fileDto = FileDto(mockFile, FileType.BOOK)
+        val fileDto = FileDto("test file", mockFile, FileType.BOOK)
         fileUploadService.createBookFile(fileDto)
 
         // When
@@ -47,7 +49,7 @@ class FileDownloadServiceTest: BaseTest() {
             "application/jpeg",
             FileInputStream("src/test/resources/test-author.jpg")
         )
-        val fileDto = FileDto(mockFile, FileType.AUTHOR_IMAGE)
+        val fileDto = FileDto("test file", mockFile, FileType.AUTHOR_IMAGE, )
         fileUploadService.createAuthorFile(fileDto)
 
         // When
@@ -57,4 +59,10 @@ class FileDownloadServiceTest: BaseTest() {
         assertNotNull(authorThumbResource)
     }
 
+    @Test
+    fun `test partial pdf download`() {
+        val file =  File("src/test/resources/test-book.pdf")
+        val pdf = PDDocument.load(file)
+        pdf.getPage(0);
+    }
 }

@@ -7,6 +7,8 @@ import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.service.BookService
+import com.marufh.pathagar.category.CategoryDto
+import com.marufh.pathagar.category.CategoryService
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.AlreadyExistException
 import com.marufh.pathagar.file.dto.FileDto
@@ -33,6 +35,7 @@ class FileUploadService(
     private val bookService: BookService,
     private val imageResizeService: ImageResizeService,
     private val authorService: AuthorService,
+    private val categoryService: CategoryService,
     private val bookRepository: BookRepository,
     private val bookMapper: BookMapper,
     private val pdfService: PdfService,
@@ -60,7 +63,7 @@ class FileUploadService(
         val totalPage = pdfService.getTotalPage(file)
 
         val book = BookDto(
-            name = name!!,
+            name = fileDto.name,
             description = "",
             filePath = getRelativePath(filePath),
             coverImage = getRelativePath(coverImage),
@@ -110,19 +113,36 @@ class FileUploadService(
     fun createAuthorFile(fileDto: FileDto): AuthorDto  {
         logger.info("Uploading author file: ${fileDto.file.originalFilename}")
 
-        val authorName =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_", " ")
+        val name =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
         val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${name}_thumb.jpg").toFile(), 200, 300)
 
         val authorDto = AuthorDto(
-            name = authorName!!,
+            name = fileDto.name,
             description = "",
             imagePath = getRelativePath(image),
             thumbnailPath = getRelativePath(thumbnail),
         )
 
         return authorService.create(authorDto)
-}
+    }
+
+    fun createCategoryFile(fileDto: FileDto): CategoryDto  {
+        logger.info("Uploading category file: ${fileDto.file.originalFilename}")
+
+        val name =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
+        val image = upload(fileDto.file, Path.of(fileProperties.category), fileDto.file.originalFilename!!)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${name}_thumb.jpg").toFile(), 200, 300)
+
+        val categoryDto = CategoryDto(
+            name = fileDto.name,
+            description = "",
+            imagePath = getRelativePath(image),
+            thumbnailPath = getRelativePath(thumbnail),
+        )
+
+        return categoryService.create(categoryDto)
+    }
 
     fun updateUploadAuthor(id: String, fileDto: FileDto): AuthorDto  {
         logger.info("Uploading author file: ${fileDto.file.originalFilename}")
