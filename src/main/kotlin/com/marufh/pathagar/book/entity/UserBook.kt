@@ -11,23 +11,25 @@ data class UserBook(
     @ManyToOne
     val book: Book,
 
-    @Column(name = "page")
-    var page:Int,
-
     @Column(name = "user_email")
     var userEmail:String,
 
-    @Column(name = "started")
-    val started:Instant,
+    @Column(name = "page")
+    var page:Int,
 
     @Enumerated(EnumType.STRING)
     var status: UserBookStatus,
 
+    @Column(name = "started")
+    val started:Instant,
+
     @Column(name = "ended")
     val ended:Instant ? = null,
 
+    @Column(name = "rating")
     var rating:Int? = null,
 
+    @Column(name = "review", length = 2048)
     var review:String? = null
 
 ): BaseEntity()

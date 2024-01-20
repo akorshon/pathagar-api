@@ -1,7 +1,7 @@
 package com.marufh.pathagar.book.entity
 
 enum class UserBookStatus {
+    WISHLIST,
     READING,
-    READ,
-    WISHLIST
+    FINISHED
 }

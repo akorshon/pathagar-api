@@ -1,6 +1,8 @@
 package com.marufh.pathagar.file.service
 
 import com.marufh.pathagar.author.dto.AuthorDto
+import com.marufh.pathagar.author.dto.AuthorMapper
+import com.marufh.pathagar.author.repository.AuthorRepository
 import com.marufh.pathagar.author.service.AuthorService
 import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookMapper
@@ -8,6 +10,8 @@ import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.service.BookService
 import com.marufh.pathagar.category.CategoryDto
+import com.marufh.pathagar.category.CategoryMapper
+import com.marufh.pathagar.category.CategoryRepository
 import com.marufh.pathagar.category.CategoryService
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.AlreadyExistException
@@ -33,10 +37,14 @@ import javax.imageio.ImageIO
 @Service
 class FileUploadService(
     private val bookService: BookService,
+    private val bookRepository: BookRepository,
     private val imageResizeService: ImageResizeService,
     private val authorService: AuthorService,
+    private val authorRepository: AuthorRepository,
+    private val authorMapper: AuthorMapper,
     private val categoryService: CategoryService,
-    private val bookRepository: BookRepository,
+    private val categoryMapper: CategoryMapper,
+    private val categoryRepository: CategoryRepository,
     private val bookMapper: BookMapper,
     private val pdfService: PdfService,
     private val fileProperties: FileProperties ) {
@@ -48,7 +56,6 @@ class FileUploadService(
     fun createBookFile(fileDto: FileDto): BookDto  {
         logger.info("Uploading book file: ${fileDto.file.originalFilename}")
 
-        val name =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_".toRegex(), " ")
         val filePath = upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
         val file = filePath.toFile()
         val hash = getHash(file)
@@ -77,12 +84,12 @@ class FileUploadService(
         return bookService.create(book)
     }
 
-    fun updateBookFile(id: String, multipartFile: MultipartFile): BookDto  {
-        logger.info("Updating book file: ${multipartFile.originalFilename}")
+    fun updateBookFile(fileDto: FileDto): BookDto  {
+        logger.info("Updating book file: ${fileDto.file.originalFilename}")
 
-        val book = bookRepository.findById(id)
-            .orElseThrow() { EntityNotFoundException("Book not found with id: $id") }
-        val filePath = upload(multipartFile, Path.of(fileProperties.book), multipartFile.originalFilename!!)
+        val book = bookRepository.findById(fileDto.id!!)
+            .orElseThrow() { EntityNotFoundException("Book not found with id: ${fileDto.id}") }
+        val filePath = upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
         val file = filePath.toFile()
         val hash = getHash(file)
 
@@ -113,9 +120,9 @@ class FileUploadService(
     fun createAuthorFile(fileDto: FileDto): AuthorDto  {
         logger.info("Uploading author file: ${fileDto.file.originalFilename}")
 
-        val name =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
+        val fileName =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
         val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${name}_thumb.jpg").toFile(), 200, 300)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
 
         val authorDto = AuthorDto(
             name = fileDto.name,
@@ -127,12 +134,30 @@ class FileUploadService(
         return authorService.create(authorDto)
     }
 
+    fun updateAuthorFile(fileDto: FileDto): AuthorDto  {
+        logger.info("Updating author file: ${fileDto.file.originalFilename}")
+
+        val author = authorRepository.findById(fileDto.id!!)
+            .orElseThrow { EntityNotFoundException("Author not found with id: ${fileDto.id}") }
+
+        val fileName =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_", " ")
+        val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
+
+        author.name = fileDto.name
+        author.description = fileDto.description
+        author.imagePath = getRelativePath(image)
+        author.thumbnailPath = getRelativePath(thumbnail)
+
+        return authorService.create(authorMapper.toDto(author));
+    }
+
     fun createCategoryFile(fileDto: FileDto): CategoryDto  {
         logger.info("Uploading category file: ${fileDto.file.originalFilename}")
 
-        val name =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
+        val fileName =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
         val image = upload(fileDto.file, Path.of(fileProperties.category), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${name}_thumb.jpg").toFile(), 200, 300)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
 
         val categoryDto = CategoryDto(
             name = fileDto.name,
@@ -144,21 +169,26 @@ class FileUploadService(
         return categoryService.create(categoryDto)
     }
 
-    fun updateUploadAuthor(id: String, fileDto: FileDto): AuthorDto  {
-        logger.info("Uploading author file: ${fileDto.file.originalFilename}")
+    fun updateCategoryFile(fileDto: FileDto): CategoryDto  {
+        logger.info("Updating category file: ${fileDto.file.originalFilename}")
 
-        val authorName =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_", " ")
-        val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${authorName}_thumb.jpg").toFile(), 200, 300)
+        val category = categoryRepository.findById(fileDto.id!!)
+            .orElseThrow { EntityNotFoundException("Category not found with id: ${fileDto.id}") }
 
-        val authorDto = AuthorDto(
-            name = authorName!!,
-            description = "",
-            imagePath = getRelativePath(image),
-            thumbnailPath = getRelativePath(thumbnail),
-        )
+        val fileName =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
+        val image = upload(fileDto.file, Path.of(fileProperties.category), fileDto.file.originalFilename!!)
+        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
 
-        return authorService.create(authorDto)
+        // remove old file
+        Files.delete(Path.of(fileProperties.base +"/"+ category.thumbnailPath))
+        Files.delete(Path.of(fileProperties.base +"/"+ category.imagePath).parent)
+
+        category.name = fileDto.name
+        category.description = fileDto.description
+        category.imagePath = getRelativePath(image)
+        category.thumbnailPath = getRelativePath(thumbnail)
+
+        return categoryService.create(categoryMapper.toDto(category));
     }
 
     fun upload(file: MultipartFile,  path: Path, name: String) = move(file.inputStream, path, name)

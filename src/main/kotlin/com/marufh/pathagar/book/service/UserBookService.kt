@@ -2,8 +2,10 @@ package com.marufh.pathagar.book.service
 
 import com.marufh.pathagar.auth.entity.User
 import com.marufh.pathagar.book.dto.UserBookDto
+import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.entity.UserBookStatus
+import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.repository.UserBookRepository
 import com.marufh.pathagar.exception.NotFoundException
 import jakarta.persistence.EntityNotFoundException
@@ -14,18 +16,20 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 @Service
-class UserBookService(private val userBookRepository: UserBookRepository) {
+class UserBookService(
+    private val bookRepository: BookRepository,
+    private val userBookRepository: UserBookRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun create(user: User, usrBookDto: UserBookDto): UserBook {
-        logger.info("Creating user {} book{}", user.email, usrBookDto.book.name)
+    fun create(user: User, book: Book): UserBook {
+        logger.info("Creating user {} book{}", user.email, book.name)
 
         val userBook = UserBook(
             userEmail = user.email,
-            book = usrBookDto.book,
-            page = usrBookDto.page,
-            rating = usrBookDto.rating,
+            book = book,
+            page = 0,
+            rating = null,
             status = UserBookStatus.READING,
             started = Instant.now()
         );
@@ -48,8 +52,15 @@ class UserBookService(private val userBookRepository: UserBookRepository) {
     fun findByUserAndBookId(user: User, bookId: String): UserBook {
         logger.info("Finding user book by user: ${user.email}   and book id: $bookId")
 
-        return userBookRepository.findByUserAndBookId(user.email, bookId)
-            ?: throw NotFoundException("UserBook not found with user: ${user.email} and book id: $bookId")
+        return userBookRepository.findByUserAndBookId(user.email, bookId).let {
+            if (it == null) {
+                val book = bookRepository.findById(bookId)
+                    .orElseThrow { NotFoundException("Book not found with id: $bookId") }
+                create(user, book)
+            } else {
+                it
+            }
+        }
     }
 
 
