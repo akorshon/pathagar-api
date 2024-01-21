@@ -1,8 +1,9 @@
-package com.marufh.pathagar.category
+package com.marufh.pathagar.category.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.marufh.pathagar.base.entity.BaseEntity
 import com.marufh.pathagar.book.entity.Book
+import com.marufh.pathagar.file.entity.FileMeta
 import jakarta.persistence.*
 
 @Entity
@@ -17,11 +18,13 @@ class Category(
     @Column(name = "description", length = 2048)
     var description: String? = null,
 
-    @Column(name = "thumbnail_path", length = 512)
-    var thumbnailPath: String? = null,
+    @ManyToOne
+    @JoinColumn(name = "image_file_id")
+    var imageFile: FileMeta? = null,
 
-    @Column(name = "image_path", length = 512)
-    var imagePath: String? = null,
+    @ManyToOne
+    @JoinColumn(name = "thumb_file_id")
+    var thumbFile: FileMeta? = null,
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "authors")

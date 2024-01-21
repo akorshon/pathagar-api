@@ -1,4 +1,4 @@
-package com.marufh.pathagar.category
+package com.marufh.pathagar.category.model
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

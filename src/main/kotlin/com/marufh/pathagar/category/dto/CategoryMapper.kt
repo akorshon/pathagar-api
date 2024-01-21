@@ -1,6 +1,6 @@
-package com.marufh.pathagar.category
+package com.marufh.pathagar.category.dto
 
-import com.marufh.pathagar.author.entity.Author
+import com.marufh.pathagar.category.model.Category
 import org.mapstruct.Mapper
 
 @Mapper(componentModel = "spring")

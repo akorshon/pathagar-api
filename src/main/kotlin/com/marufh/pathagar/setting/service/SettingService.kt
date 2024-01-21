@@ -32,20 +32,20 @@ class SettingService(
         while (!onePage.isEmpty()) {
             pageRequest = pageRequest.next()
             for (book in onePage.getContent()) {
-                if (book.hash != null) {
+                /*if (book.hash != null) {
                     continue
-                }
+                }*/
                 logger.info("Generating hash for: {}", book.name)
                 try {
-                    val file = File(fileProperties.base +"/"+ book.filePath)
+                    val file = File(fileProperties.base +"/"+ book.pdfFile?.path)
                     val fi = FileInputStream(file)
                     val fileData = ByteArray(file.length().toInt())
                     fi.read(fileData)
                     fi.close()
                     val hash: String = BigInteger(1, messageDigest.digest(fileData)).toString(16)
-                    book.hash = hash
+                    //book.hash = hash
                     book.totalPage = pdfService.getTotalPage(file)
-                    book.size = file.length()
+                    //book.size = file.length()
                     bookRepository.save(book)
                 } catch (e: Exception) {
                     logger.warn("Error generating hash: {}", e.message)

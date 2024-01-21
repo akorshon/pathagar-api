@@ -15,7 +15,7 @@ class PdfServiceTest: BaseTest() {
 
         // Given
         val file =  File("src/test/resources/test-book.pdf").toPath()
-        val thumbPath = File("src/test/resources").toPath()
+        val thumbPath = File("src/test/resources/test-book.jpg").toPath()
 
         // When
         val path = pdfService.convertToThumbFromPage(file, thumbPath, 0)

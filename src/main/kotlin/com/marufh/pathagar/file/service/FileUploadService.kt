@@ -1,22 +1,11 @@
 package com.marufh.pathagar.file.service
 
-import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.author.dto.AuthorMapper
-import com.marufh.pathagar.author.repository.AuthorRepository
-import com.marufh.pathagar.author.service.AuthorService
-import com.marufh.pathagar.book.dto.BookDto
-import com.marufh.pathagar.book.dto.BookMapper
-import com.marufh.pathagar.book.entity.Book
-import com.marufh.pathagar.book.repository.BookRepository
-import com.marufh.pathagar.book.service.BookService
-import com.marufh.pathagar.category.CategoryDto
-import com.marufh.pathagar.category.CategoryMapper
-import com.marufh.pathagar.category.CategoryRepository
-import com.marufh.pathagar.category.CategoryService
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.AlreadyExistException
 import com.marufh.pathagar.file.dto.FileDto
+import com.marufh.pathagar.file.entity.FileMeta
 import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.repository.FileMetaRepository
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -31,167 +20,89 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
-import javax.imageio.ImageIO
+import java.time.Instant
 
 
 @Service
 class FileUploadService(
-    private val bookService: BookService,
-    private val bookRepository: BookRepository,
-    private val imageResizeService: ImageResizeService,
-    private val authorService: AuthorService,
-    private val authorRepository: AuthorRepository,
-    private val authorMapper: AuthorMapper,
-    private val categoryService: CategoryService,
-    private val categoryMapper: CategoryMapper,
-    private val categoryRepository: CategoryRepository,
-    private val bookMapper: BookMapper,
-    private val pdfService: PdfService,
-    private val fileProperties: FileProperties ) {
+    private val fileProperties: FileProperties,
+    private val fileMetaRepository: FileMetaRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val fileNameRegex = "\\.[^/.]+$"
 
-    fun createBookFile(fileDto: FileDto): BookDto  {
-        logger.info("Uploading book file: ${fileDto.file.originalFilename}")
+    fun createFile(fileDto: FileDto): FileMeta {
+        logger.info("Uploading  file: ${fileDto.file.originalFilename}")
 
-        val filePath = upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
+        val filePath = filePath(fileDto)
         val file = filePath.toFile()
         val hash = getHash(file)
+        val size = file.length()
 
-        bookRepository.findByHash(hash!!)?.run {
-            logger.info("Book already exist with hash: $hash")
-            throw AlreadyExistException("Book already exist with hash: $hash")
+        fileMetaRepository.findByHash(hash!!)?.run {
+            logger.info("file already exist with hash: $hash")
+            throw AlreadyExistException("File already exist")
         }
 
-        val coverImage = pdfService.convertToThumbFromPage(filePath, filePath.parent, 0)
-        val size = file.length()
-        val totalPage = pdfService.getTotalPage(file)
-
-        val book = BookDto(
+       return FileMeta(
             name = fileDto.name,
-            description = "",
-            filePath = getRelativePath(filePath),
-            coverImage = getRelativePath(coverImage),
-            deleted = false,
-            fileType = FileType.BOOK,
+            fileType = fileDto.fileType,
+            path = getRelativePath(filePath),
             hash = hash,
             size = size,
-            totalPage = totalPage,
-            coverImagePage = 0,
-        )
-        return bookService.create(book)
+            createdAt = Instant.now()
+        ).let { fileMetaRepository.save(it) }
     }
 
-    fun updateBookFile(fileDto: FileDto): BookDto  {
-        logger.info("Updating book file: ${fileDto.file.originalFilename}")
+    fun createFile(path: Path, name: String, fileType: FileType): FileMeta {
+        return FileMeta(
+            name = path.fileName.toString().replace(fileNameRegex, ""),
+            fileType = fileType,
+            path = getRelativePath(path),
+            hash = getHash(path.toFile())!!,
+            size = path.toFile().length(),
+            createdAt = Instant.now()
+        ).let { fileMetaRepository.save(it) }
+    }
 
-        val book = bookRepository.findById(fileDto.id!!)
-            .orElseThrow() { EntityNotFoundException("Book not found with id: ${fileDto.id}") }
-        val filePath = upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
+    fun updateFile(fileDto: FileDto): FileMeta  {
+        logger.info("Updating file: ${fileDto.file.originalFilename}")
+
+        val fileMeta = fileMetaRepository.findById(fileDto.id!!)
+            .orElseThrow() { EntityNotFoundException("File not found with id: ${fileDto.id}") }
+
+        val filePath = filePath(fileDto)
         val file = filePath.toFile()
         val hash = getHash(file)
+        val size = file.length()
 
-        bookRepository.findByHash(hash!!)?.run {
-            logger.info("Book already exist with hash: $hash")
-            throw AlreadyExistException("Book already exist with hash: $hash")
+        fileMetaRepository.findByHash(hash!!)?.run {
+            logger.info("File already exist with hash: $hash")
+            throw AlreadyExistException("Book already exist")
         }
 
         // remove old file
-        Files.delete(Path.of(fileProperties.base +"/"+ book.filePath))
-        Files.delete(Path.of(fileProperties.base +"/"+ book.coverImage))
-        Files.delete(Path.of(fileProperties.base +"/"+ book.filePath).parent)
+        Files.delete(Path.of(fileProperties.base +"/"+ fileMeta.path))
 
-        val coverImage = pdfService.convertToThumbFromPage(filePath, filePath.parent, 0)
-        val size = file.length()
-        val totalPage = pdfService.getTotalPage(file)
+        fileMeta.name = fileDto.name
+        fileMeta.path = getRelativePath(filePath)
+        fileMeta.hash = hash
+        fileMeta.size = size
+        fileMeta.createdAt = Instant.now()
 
-        book.filePath = getRelativePath(filePath)
-        book.coverImage = getRelativePath(coverImage)
-        book.hash = hash
-        book.size = size
-        book.totalPage = totalPage
-        book.coverImagePage = 0
-
-        return bookRepository.save(book).let { bookMapper.toDto(it) }
+        return fileMetaRepository.save(fileMeta)
     }
 
-    fun createAuthorFile(fileDto: FileDto): AuthorDto  {
-        logger.info("Uploading author file: ${fileDto.file.originalFilename}")
 
-        val fileName =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
-        val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
-
-        val authorDto = AuthorDto(
-            name = fileDto.name,
-            description = "",
-            imagePath = getRelativePath(image),
-            thumbnailPath = getRelativePath(thumbnail),
-        )
-
-        return authorService.create(authorDto)
-    }
-
-    fun updateAuthorFile(fileDto: FileDto): AuthorDto  {
-        logger.info("Updating author file: ${fileDto.file.originalFilename}")
-
-        val author = authorRepository.findById(fileDto.id!!)
-            .orElseThrow { EntityNotFoundException("Author not found with id: ${fileDto.id}") }
-
-        val fileName =  fileDto.file.originalFilename?.replace(fileNameRegex.toRegex(), "")?.replace("_", " ")
-        val image = upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
-
-        author.name = fileDto.name
-        author.description = fileDto.description
-        author.imagePath = getRelativePath(image)
-        author.thumbnailPath = getRelativePath(thumbnail)
-
-        return authorService.create(authorMapper.toDto(author));
-    }
-
-    fun createCategoryFile(fileDto: FileDto): CategoryDto  {
-        logger.info("Uploading category file: ${fileDto.file.originalFilename}")
-
-        val fileName =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
-        val image = upload(fileDto.file, Path.of(fileProperties.category), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
-
-        val categoryDto = CategoryDto(
-            name = fileDto.name,
-            description = "",
-            imagePath = getRelativePath(image),
-            thumbnailPath = getRelativePath(thumbnail),
-        )
-
-        return categoryService.create(categoryDto)
-    }
-
-    fun updateCategoryFile(fileDto: FileDto): CategoryDto  {
-        logger.info("Updating category file: ${fileDto.file.originalFilename}")
-
-        val category = categoryRepository.findById(fileDto.id!!)
-            .orElseThrow { EntityNotFoundException("Category not found with id: ${fileDto.id}") }
-
-        val fileName =  fileDto.file.originalFilename!!.substring(0, fileDto.file.originalFilename!!.lastIndexOf('.')).replace(fileNameRegex.toRegex(), "").replace(" ", "_")
-        val image = upload(fileDto.file, Path.of(fileProperties.category), fileDto.file.originalFilename!!)
-        val thumbnail = imageResizeService.resize(ImageIO.read(image.toFile()), image.parent.resolve( "${fileName}_thumb.jpg").toFile(), 200, 300)
-
-        // remove old file
-        Files.delete(Path.of(fileProperties.base +"/"+ category.thumbnailPath))
-        Files.delete(Path.of(fileProperties.base +"/"+ category.imagePath).parent)
-
-        category.name = fileDto.name
-        category.description = fileDto.description
-        category.imagePath = getRelativePath(image)
-        category.thumbnailPath = getRelativePath(thumbnail)
-
-        return categoryService.create(categoryMapper.toDto(category));
-    }
 
     fun upload(file: MultipartFile,  path: Path, name: String) = move(file.inputStream, path, name)
+
+    private fun filePath(fileDto: FileDto) = when(fileDto.fileType) {
+        FileType.BOOK -> upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)
+        FileType.AUTHOR ->  upload(fileDto.file, Path.of(fileProperties.author), fileDto.file.originalFilename!!)
+        FileType.CATEGORY ->  upload(fileDto.file, Path.of(fileProperties.category), fileDto.file.originalFilename!!)
+    }
 
     private fun move(inputStream: InputStream, path: Path, name: String) = getFinalPath(path, name).apply {
         Files.copy(inputStream, this, StandardCopyOption.REPLACE_EXISTING)
@@ -201,21 +112,6 @@ class FileUploadService(
         val subDirectory = name.replace("\\.[^/.]+\$".toRegex(), "").trim().replace("\\s+".toRegex(), "_")
         return path.resolve(subDirectory).apply { Files.createDirectories(this) }.resolve(name);
     }
-
-    fun updateThumb(bookId: String, page: Int): Book {
-        logger.info("Updating book thumb: $bookId, page: $page")
-
-        val book = bookRepository.findById(bookId)
-            .orElseThrow { EntityNotFoundException("Book not found with id: $bookId") }
-
-        val path = Path.of(fileProperties.base +"/"+ book.filePath)
-        val thumbPath = pdfService.convertToThumbFromPage(path, path.parent, page)
-
-        book.coverImagePage = page
-        book.coverImage = getRelativePath(thumbPath)
-        return bookRepository.save(book)
-    }
-
 
     private fun getRelativePath(filePath: Path): String {
         return Path.of(fileProperties.base).relativize(filePath).toString()

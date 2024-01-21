@@ -1,8 +1,8 @@
-package com.marufh.pathagar.category
+package com.marufh.pathagar.author.dto
 
 import com.marufh.pathagar.book.dto.BookDto
 
-data class CategoryDto(
+data class AuthorDetailsDto(
     val id: String? = null,
     var name: String,
     var description: String? = null,

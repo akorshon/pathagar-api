@@ -1,21 +1,29 @@
 package com.marufh.pathagar.file
 
-import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.book.dto.BookDto
-import com.marufh.pathagar.category.CategoryDto
 import com.marufh.pathagar.file.dto.FileDto
+import com.marufh.pathagar.file.entity.FileMeta
 import com.marufh.pathagar.file.service.FileUploadService
 import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/admin/file")
-class FileAdminController(private val fileUploadService: FileUploadService) {
+class FileAdminController(
+    private val fileUploadService: FileUploadService) {
 
-    @PostMapping("/book")
+    fun create(@ModelAttribute fileDto: FileDto): FileMeta {
+        return fileUploadService.createFile(fileDto)
+    }
+
+    @PutMapping("/book")
+    fun update(@ModelAttribute fileDto: FileDto): FileMeta {
+        return fileUploadService.updateFile(fileDto)
+    }
+
+
+    /*@PostMapping("/book")
     fun createBook(@ModelAttribute fileDto: FileDto): BookDto {
         return fileUploadService.createBookFile(fileDto)
     }
@@ -43,5 +51,5 @@ class FileAdminController(private val fileUploadService: FileUploadService) {
     @PutMapping("/category")
     fun updateCategory(@ModelAttribute fileDto: FileDto): CategoryDto {
         return fileUploadService.updateCategoryFile(fileDto)
-    }
+    }*/
 }

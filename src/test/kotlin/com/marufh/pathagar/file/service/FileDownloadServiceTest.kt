@@ -29,8 +29,8 @@ class FileDownloadServiceTest: BaseTest() {
             "application/pdf",
             FileInputStream("src/test/resources/test-book.pdf")
         )
-        val fileDto = FileDto("test file", mockFile, FileType.BOOK)
-        fileUploadService.createBookFile(fileDto)
+        val fileDto = FileDto(name = "test file", file =  mockFile, fileType =  FileType.BOOK)
+        fileUploadService.createFile(fileDto)
 
         // When
         val bookResource = fileDownloadService.getFile("book/test-book/test-book.pdf");
@@ -49,8 +49,8 @@ class FileDownloadServiceTest: BaseTest() {
             "application/jpeg",
             FileInputStream("src/test/resources/test-author.jpg")
         )
-        val fileDto = FileDto("test file", mockFile, FileType.AUTHOR_IMAGE, )
-        fileUploadService.createAuthorFile(fileDto)
+        val fileDto = FileDto(name = "test file", file = mockFile, fileType = FileType.AUTHOR, )
+        fileUploadService.createFile(fileDto)
 
         // When
         val authorResource = fileDownloadService.getFile("author/test-author/test-author.jpg");

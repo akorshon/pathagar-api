@@ -1,9 +1,16 @@
-package com.marufh.pathagar.category
+package com.marufh.pathagar.category.service
 
 import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
+import com.marufh.pathagar.category.dto.CategoryDto
+import com.marufh.pathagar.category.dto.CategoryMapper
+import com.marufh.pathagar.category.model.CategoryRepository
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
+import com.marufh.pathagar.file.dto.FileDto
+import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.service.FileUploadService
+import com.marufh.pathagar.file.service.ImageResizeService
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -15,6 +22,8 @@ import java.nio.file.Path
 
 @Service
 class CategoryService(
+    private val imageResizeService: ImageResizeService,
+    private val fileUploadService: FileUploadService,
     private val bookRepository: BookRepository,
     private val fileProperties: FileProperties,
     private val categoryMapper: CategoryMapper,
@@ -26,7 +35,20 @@ class CategoryService(
     fun create(categoryDto: CategoryDto): CategoryDto {
         logger.info("Creating author: ${categoryDto.name}")
 
+        if(categoryDto.file == null) {
+            throw IllegalArgumentException("File is required")
+        }
+
+        val imageFile = fileUploadService.createFile(FileDto(
+            name = categoryDto.file?.name!!,
+            fileType = FileType.CATEGORY,
+            file = categoryDto.file!!
+        ))
+        val thumbFile = imageResizeService.createThumb(Path.of(fileProperties.base, imageFile.path), FileType.CATEGORY)
+
         categoryMapper.toEntity(categoryDto).run {
+            this.imageFile = imageFile
+            this.thumbFile = thumbFile
             return categoryMapper.toDto(categoryRepository.save(this))
         }
     }
@@ -36,9 +58,19 @@ class CategoryService(
         logger.info("Updating author {}:", categoryDto.name)
 
         val author = categoryRepository.findById(categoryDto.id!!)
-            .orElseThrow { EntityNotFoundException("Author not found with id: ${categoryDto.id}") }
+            .orElseThrow { NotFoundException("Category not found with id: ${categoryDto.id}") }
         author.name = categoryDto.name
         author.description = categoryDto.description
+        if (categoryDto.file != null) {
+            val imageFile = fileUploadService.createFile(FileDto(
+                name = categoryDto.file?.name!!,
+                fileType = FileType.CATEGORY,
+                file = categoryDto.file!!
+            ))
+            val thumbFile = imageResizeService.createThumb(Path.of(fileProperties.base, imageFile.path), FileType.CATEGORY)
+            author.imageFile = imageFile
+            author.thumbFile = thumbFile
+        }
         return categoryRepository.save(author).run { categoryMapper.toDto(this) }
     }
 
@@ -48,7 +80,7 @@ class CategoryService(
 
         return categoryRepository.findById(id)
             .map {categoryMapper.toDto(it) }
-            .orElseThrow { NotFoundException("Author not found with id: $id") }
+            .orElseThrow { NotFoundException("Category not found with id: $id") }
     }
 
     @Transactional
@@ -71,21 +103,19 @@ class CategoryService(
     }
 
     fun delete(id: String) {
-        logger.info("Deleting author by id: $id")
+        logger.info("Deleting category by id: $id")
 
-        val author =  categoryRepository.findById(id)
-            .orElseThrow{ NotFoundException("Author not found with id: $id") }
+        val category =  categoryRepository.findById(id)
+            .orElseThrow{ NotFoundException("Category not found with id: $id") }
 
-        try {
-            logger.info("Deleting author image and thumbnail")
-            Files.delete(Path.of(fileProperties.base +"/"+ author.imagePath))
-            Files.delete(Path.of(fileProperties.base +"/"+ author.thumbnailPath))
-            Files.delete(Path.of(fileProperties.base +"/"+ author.imagePath).parent)
-        } catch (e: Exception) {
-            logger.error("Error deleting file: {}", e.message)
-        } finally {
-            logger.info("Deleting author from database")
-            categoryRepository.delete(author);
+        if(category.deleted) {
+            Files.delete(Path.of(fileProperties.base, category.imageFile?.path))
+            Files.delete(Path.of(fileProperties.base, category.thumbFile?.path))
+            Files.delete(Path.of(fileProperties.base, category.imageFile?.path).parent)
+            categoryRepository.delete(category);
+        } else {
+            category.deleted = true
+            categoryRepository.save(category)
         }
     }
 
