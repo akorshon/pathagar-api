@@ -1,14 +1,11 @@
 package com.marufh.pathagar.book.dto
 
 import com.marufh.pathagar.book.entity.Book
+import com.marufh.pathagar.file.dto.FileMetaMapper
 import org.mapstruct.Mapper
-import org.mapstruct.Mapping
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = [FileMetaMapper::class])
 interface BookMapper {
-
     fun toDto(book: Book): BookDto
-
-    @Mapping(target = "authors", ignore = true)
     fun toEntity(bookDto: BookDto): Book
 }

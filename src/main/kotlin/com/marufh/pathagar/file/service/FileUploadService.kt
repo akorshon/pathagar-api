@@ -98,9 +98,12 @@ class FileUploadService(
             .forEach { p ->
                 var fileType: FileType = FileType.BOOK
                 when {
-                    p.pathString.contains("/author/") -> fileType = FileType.AUTHOR
-                    p.pathString.contains("/book/") -> fileType = FileType.BOOK
-                    p.pathString.contains("/category/") -> fileType = FileType.CATEGORY
+                    p.pathString.contains("/author/") && !p.pathString.endsWith("thumb.jpg") -> fileType = FileType.AUTHOR
+                    p.pathString.contains("/author/") && p.pathString.endsWith("thumb.jpg") -> fileType = FileType.AUTHOR_THUMB
+                    p.pathString.contains("/book/") && p.pathString.endsWith("pdf") -> fileType = FileType.BOOK
+                    p.pathString.contains("/book/") && p.pathString.endsWith("jpg") -> fileType = FileType.BOOK_THUMB
+                    p.pathString.contains("/category/") && !p.pathString.endsWith("thumb.jpg")  -> fileType = FileType.CATEGORY
+                    p.pathString.contains("/category/") && p.pathString.endsWith("thumb.jpg") -> fileType = FileType.CATEGORY_THUMB
                 }
 
                 val fileMeta = FileMeta(

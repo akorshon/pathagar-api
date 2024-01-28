@@ -44,12 +44,12 @@ class CategoryService(
             fileType = FileType.CATEGORY,
             file = categoryDto.file!!
         ))
-        val thumbFile = imageResizeService.createThumb(Path.of(fileProperties.base, imageFile.path), FileType.CATEGORY)
+        val thumbFile = imageResizeService.createThumb(Path.of(fileProperties.base, imageFile.path), FileType.CATEGORY_THUMB)
 
-        categoryMapper.toEntity(categoryDto).run {
-            this.imageFile = imageFile
-            this.thumbFile = thumbFile
-            return categoryMapper.toDto(categoryRepository.save(this))
+        return categoryMapper.toEntity(categoryDto).let {
+            it.imageFile = imageFile
+            it.thumbFile = thumbFile
+            categoryMapper.toDto(categoryRepository.save(it))
         }
     }
 
@@ -67,11 +67,14 @@ class CategoryService(
                 fileType = FileType.CATEGORY,
                 file = categoryDto.file!!
             ))
-            val thumbFile = imageResizeService.createThumb(Path.of(fileProperties.base, imageFile.path), FileType.CATEGORY)
+            val thumbFile = imageResizeService.createThumb(Path.of(fileProperties.base, imageFile.path), FileType.CATEGORY_THUMB)
             author.imageFile = imageFile
             author.thumbFile = thumbFile
         }
-        return categoryRepository.save(author).run { categoryMapper.toDto(this) }
+
+        return categoryRepository.save(author).let {
+            categoryMapper.toDto(it)
+        }
     }
 
     @Transactional

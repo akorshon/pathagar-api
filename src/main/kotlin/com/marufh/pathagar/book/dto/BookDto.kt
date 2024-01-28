@@ -12,8 +12,8 @@ data class BookDto(
     var description: String? = null,
     var deleted: Boolean? = null,
     var pdfFile: FileMeta? = null,
-    var totalPage: Int? = null,
     var coverImage: FileMeta? = null,
+    var totalPage: Int? = null,
     var authors: Set<AuthorDto>? = null,
     var categories: Set<CategoryDto>? = null,
 )

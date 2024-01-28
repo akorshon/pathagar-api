@@ -15,7 +15,7 @@ class FileMeta(
     @Column(name = "name")
     var name: String,
 
-    @Column(name = "path")
+    @Column(name = "path", length = 512)
     var path: String,
 
     @Column(name = "file_type")
