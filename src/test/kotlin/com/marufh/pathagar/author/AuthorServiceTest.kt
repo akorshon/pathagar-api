@@ -1,4 +1,4 @@
-package com.marufh.pathagar.author.service
+package com.marufh.pathagar.author
 
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.exception.NotFoundException
@@ -16,6 +16,7 @@ class AuthorServiceTest: BaseTest() {
     fun setup() {
         bookRepository.deleteAll()
         authorRepository.deleteAll()
+        categoryRepository.deleteAll()
         fileMetaRepository.deleteAll()
         Files.deleteIfExists(Path.of(fileProperties.author).resolve("test-author/test-author.jpg"))
     }
@@ -23,28 +24,33 @@ class AuthorServiceTest: BaseTest() {
     @Test
     fun `test create author`() {
         // Given
-        val authorDto = getAuthorDto();
+        val authorDto = getAuthorDto()
 
         // When
-        val author = authorService.create(authorDto)
+        val result  = authorService.create(authorDto)
 
         // Then
-        assert(author.id != null)
-        assert(author.name == authorDto.name)
-        assert(author.description == authorDto.description)
-        assert(author.imageFile?.path == "author/test-author/test-author.jpg")
-        assert(author.thumbFile?.path == "author/test-author/test-author_thumb.jpg")
-        assert(author.deleted == authorDto.deleted)
+        assert(result.id != null)
+        assert(result.name == authorDto.name)
+        assert(result.description == authorDto.description)
+        assert(result.deleted == authorDto.deleted)
+        assert(result.imageFile?.path == "author/test-author/test-author.jpg")
+        assert(result.thumbFile?.path == "author/test-author/test-author_thumb.jpg")
     }
 
     @Test
     fun `test create author exception`() {
+
+        // Given
         val authorDto = getAuthorDto();
         authorDto.file = null
 
+        // When
         val exception = assertThrows<IllegalArgumentException> {
             authorService.create(authorDto)
         }
+
+        // Then
         assert(exception.message == "File is required")
     }
 
@@ -56,24 +62,29 @@ class AuthorServiceTest: BaseTest() {
         authorDto.description = "Updated Author Description"
 
         // When
-        authorService.update(authorDto).apply {
-            // Then
-            assert(id != null)
-            assert(name == authorDto.name)
-            assert(description == authorDto.description)
-            assert(deleted == authorDto.deleted)
-            assert(imageFile?.path == "author/test-author/test-author.jpg")
-            assert(thumbFile?.path == "author/test-author/test-author_thumb.jpg")
-        }
+        val result = authorService.update(authorDto)
+
+        // Then
+        assert(result.id != null)
+        assert(result.name == authorDto.name)
+        assert(result.description == authorDto.description)
+        assert(result.deleted == authorDto.deleted)
+        assert(result.imageFile?.path == "author/test-author/test-author.jpg")
+        assert(result.thumbFile?.path == "author/test-author/test-author_thumb.jpg")
     }
 
     @Test
     fun `test update author not found exception`() {
+        // Given
         val authorDto = getAuthorDto();
         authorDto.id = "invalid-id"
+
+        // When
         val exception = assertThrows<NotFoundException> {
             authorService.update(authorDto)
         }
+
+        // Then
         assert(exception.message == "Author not found with id: invalid-id")
     }
 
@@ -85,21 +96,23 @@ class AuthorServiceTest: BaseTest() {
         val authorDto = authorService.create(getAuthorDto())
 
         // When
-        authorService.findById(authorDto.id!!).apply {
+        val authorDetailsDto = authorService.findById(authorDto.id!!)
 
-            // Then
-            assert(id != null)
-            assert(name == authorDto.name)
-            assert(description == authorDto.description)
-            assert(deleted == authorDto.deleted)
-        }
+        // Then
+        assert(authorDetailsDto.id != null)
+        assert(authorDetailsDto.name == authorDto.name)
+        assert(authorDetailsDto.description == authorDto.description)
+        assert(authorDetailsDto.deleted == authorDto.deleted)
     }
 
     @Test
     fun `test get author by id not found exception`() {
+        // Given and When
         val exception = assertThrows<NotFoundException> {
             authorService.findById("invalid-id")
         }
+
+        // Then
         assert(exception.message == "Author not found with id: invalid-id")
     }
 
@@ -118,13 +131,12 @@ class AuthorServiceTest: BaseTest() {
         authorRepository.saveAll(authorList)
 
         // When
-        authorService.findAll("", PageRequest.of(0, 10)).apply {
+        val authorDtoPage = authorService.findAll("", PageRequest.of(0, 10))
 
-            // Then
-            assert(totalElements == 5L)
-            assert(totalPages == 1)
-            assert(content.size == 5)
-        }
+        // Then
+        assert(authorDtoPage.totalElements == 5L)
+        assert(authorDtoPage.totalPages == 1)
+        assert(authorDtoPage.content.size == 5)
     }
 
 
@@ -135,14 +147,13 @@ class AuthorServiceTest: BaseTest() {
         val author = authorService.create(getAuthorDto())
 
         bookService.updateAuthor(book.id!!, author.id!!, "add")
-        authorService.getAuthorDetails(author.id!!).apply {
-            assert(books?.size == 1)
-        }
+        val result1 = authorService.getAuthorDetails(author.id!!)
+        assert(result1.books?.size == 1)
+
 
         bookService.updateAuthor(book.id!!, author.id!!, "remove")
-        authorService.getAuthorDetails(author.id!!).apply {
-            assert(books?.size == 0)
-        }
+        val result2 = authorService.getAuthorDetails(author.id!!)
+        assert(result2.books?.size == 0)
     }
 
     @Test
@@ -184,9 +195,12 @@ class AuthorServiceTest: BaseTest() {
 
     @Test
     fun `test delete author not found exception`() {
+        // Given and When
         val exception = assertThrows<NotFoundException> {
             authorService.delete("invalid-id")
         }
+
+        // Then
         assert(exception.message == "Author not found with id: invalid-id")
     }
 }

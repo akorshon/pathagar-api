@@ -1,4 +1,4 @@
-package com.marufh.pathagar.file.service
+package com.marufh.pathagar.file
 
 import com.marufh.pathagar.BaseTest
 import org.junit.jupiter.api.Assertions.assertEquals

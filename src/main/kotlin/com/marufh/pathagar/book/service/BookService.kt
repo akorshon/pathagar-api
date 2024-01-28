@@ -43,8 +43,8 @@ class BookService(
             file = bookDto.file!!,
             fileType = FileType.BOOK
         ))
-        val coverImageFile = pdfService.createCoverImage(Path.of(fileProperties.base +"/"+ pdfFile.path))
-        val totalPage = pdfService.getTotalPage(Path.of(fileProperties.base +"/"+ pdfFile.path).toFile())
+        val coverImageFile = pdfService.createCoverImage(Path.of(fileProperties.base, pdfFile.path), FileType.BOOK_THUMB)
+        val totalPage = pdfService.getTotalPage(Path.of(fileProperties.base, pdfFile.path).toFile())
 
         return bookMapper.toEntity(bookDto).let {
             it.pdfFile = pdfFile
@@ -69,7 +69,7 @@ class BookService(
                 file = bookDto.file!!,
                 fileType = FileType.BOOK
             ))
-            book.coverImage = pdfService.createCoverImage(Path.of(fileProperties.base +"/"+ book.pdfFile?.path))
+            book.coverImage = pdfService.createCoverImage(Path.of(fileProperties.base +"/"+ book.pdfFile?.path), FileType.BOOK_THUMB)
             book.totalPage = pdfService.getTotalPage(Path.of(fileProperties.base +"/"+ book.pdfFile?.path).toFile())
         }
         return bookRepository.save(book).run { bookMapper.toDto(this) }

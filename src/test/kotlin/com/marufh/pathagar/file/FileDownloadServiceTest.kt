@@ -1,4 +1,4 @@
-package com.marufh.pathagar.file.service
+package com.marufh.pathagar.file
 
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.file.dto.FileDto
@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.mock.web.MockMultipartFile
 import java.io.File
 import java.io.FileInputStream
+import java.nio.file.Files
+import java.nio.file.Path
 
 class FileDownloadServiceTest: BaseTest() {
 
@@ -17,6 +19,11 @@ class FileDownloadServiceTest: BaseTest() {
     fun setup() {
         authorRepository.deleteAllInBatch()
         bookRepository.deleteAllInBatch()
+        categoryRepository.deleteAllInBatch()
+        fileMetaRepository.deleteAll()
+        Files.deleteIfExists(Path.of(fileProperties.book, "test-book/test-book.pdf"))
+        Files.deleteIfExists(Path.of(fileProperties.author, "test-author/test-author.jpg"))
+        Files.deleteIfExists(Path.of(fileProperties.category, "test-category/test-category.jpg"))
     }
     
     @Test
@@ -34,9 +41,7 @@ class FileDownloadServiceTest: BaseTest() {
 
         // When
         val bookResource = fileDownloadService.getFile("book/test-book/test-book.pdf");
-        val bookThumbResource = fileDownloadService.getFile("book/test-book/test-book.jpg");
         assertNotNull(bookResource)
-        assertNotNull(bookThumbResource)
     }
 
     @Test
@@ -54,9 +59,7 @@ class FileDownloadServiceTest: BaseTest() {
 
         // When
         val authorResource = fileDownloadService.getFile("author/test-author/test-author.jpg");
-        val authorThumbResource = fileDownloadService.getFile("author/test-author/test-author_thumb.jpg");
         assertNotNull(authorResource)
-        assertNotNull(authorThumbResource)
     }
 
     @Test

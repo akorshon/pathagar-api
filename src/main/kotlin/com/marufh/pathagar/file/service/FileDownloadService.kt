@@ -20,7 +20,7 @@ class FileDownloadService(private val fileProperties: FileProperties) {
     fun getFile(path: String): ResponseEntity<Resource> {
         logger.info("Downloading file: $path")
 
-        return Path.of(fileProperties.base.plus(path)).run {
+        return Path.of(fileProperties.base, path).run {
             if(toFile().exists()) {
                 ResponseEntity.status(HttpStatus.OK)
                     .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS))

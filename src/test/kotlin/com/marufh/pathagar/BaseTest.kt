@@ -1,6 +1,12 @@
 package com.marufh.pathagar
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.marufh.pathagar.auth.entity.Role
+import com.marufh.pathagar.auth.entity.User
+import com.marufh.pathagar.auth.repository.UserRepository
+import com.marufh.pathagar.auth.service.HashService
+import com.marufh.pathagar.auth.service.TokenService
+import com.marufh.pathagar.auth.service.UserService
 import com.marufh.pathagar.author.dto.AuthorDto
 import com.marufh.pathagar.author.dto.AuthorMapper
 import com.marufh.pathagar.author.repository.AuthorRepository
@@ -87,6 +93,26 @@ class BaseTest {
 
     @Autowired
     lateinit var fileProperties: FileProperties
+
+    @Autowired
+    lateinit var hashService: HashService
+
+    @Autowired
+    lateinit var tokenService: TokenService
+
+    @Autowired
+    lateinit var userService: UserService
+
+    @Autowired
+    lateinit var userRepository: UserRepository
+
+    fun getUser(): User {
+        return User(
+            email = "test" + UUID.randomUUID().toString() + "@gmail.com",
+            password = "password",
+            roles = setOf(Role.ROLE_USER)
+        )
+    }
 
     fun getAuthorDto(): AuthorDto {
         return AuthorDto(

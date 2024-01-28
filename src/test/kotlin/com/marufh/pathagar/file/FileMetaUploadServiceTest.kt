@@ -1,4 +1,4 @@
-package com.marufh.pathagar.file.service
+package com.marufh.pathagar.file
 
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.file.dto.FileDto
@@ -15,14 +15,18 @@ class FileMetaUploadServiceTest: BaseTest() {
 
     @BeforeEach
     fun setup() {
+        authorRepository.deleteAll()
+        bookRepository.deleteAll()
+        categoryRepository.deleteAll()
         fileMetaRepository.deleteAll()
+        Files.deleteIfExists(Path.of(fileProperties.book, "test-book/test-book.pdf"))
+        Files.deleteIfExists(Path.of(fileProperties.author, "test-author/test-author.jpg"))
+        Files.deleteIfExists(Path.of(fileProperties.category, "test-category/test-category.jpg"))
     }
 
     @Test
     fun `test create file`() {
         logger.info("Testing upload file")
-
-        Files.deleteIfExists(Path.of(fileProperties.book).resolve("test-book/test-book.pdf"))
 
         val mockFile = MockMultipartFile("file",
             "test-book.pdf",
@@ -50,7 +54,6 @@ class FileMetaUploadServiceTest: BaseTest() {
     fun `test update file`() {
         logger.info("Testing update file")
 
-        Files.deleteIfExists(Path.of(fileProperties.book).resolve("tes-book/test-book.jpg"))
         val mockFile = MockMultipartFile("file",
             "test-book.jpg",
             "application/jpeg",
@@ -92,5 +95,10 @@ class FileMetaUploadServiceTest: BaseTest() {
        assertEquals("book/test-book2/test-book2.jpg", updateFile.path)
        assertTrue(Files.exists(Path.of(fileProperties.book).resolve("test-book2/test-book2.jpg")))
    }
+
+    @Test
+    fun `test file reindex`() {
+        fileUploadService.reindexBook()
+    }
 
 }

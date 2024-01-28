@@ -48,12 +48,12 @@ class PdfService(
         return bookThumb;
     }
 
-    fun createCoverImage(pdfFilePath: Path): FileMeta {
+    fun createCoverImage(pdfFilePath: Path, fileType: FileType): FileMeta {
 
         val path = convertToThumbFromPage(pdfFilePath, pdfFilePath.parent, 0);
         return fileMetaRepository.save(FileMeta(
             name = path.fileName.toString(),
-            fileType = FileType.BOOK,
+            fileType = fileType,
             path = getRelativePath(path),
             hash = getHash(path.toFile())!!,
             size = path.toFile().length(),

@@ -1,9 +1,8 @@
 package com.marufh.pathagar.setting.service
 
-import com.marufh.pathagar.book.entity.Book
-import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.config.FileProperties
-import com.marufh.pathagar.file.service.PdfService
+import com.marufh.pathagar.file.entity.FileMeta
+import com.marufh.pathagar.file.repository.FileMetaRepository
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -17,10 +16,8 @@ import java.security.NoSuchAlgorithmException
 
 @Service
 class SettingService(
-
-    private val pdfService: PdfService,
-    private val bookRepository: BookRepository,
-    private val fileProperties: FileProperties, ) {
+    private val fileProperties: FileProperties,
+    private val fileMetaRepository: FileMetaRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -28,30 +25,29 @@ class SettingService(
         logger.info("Generating hash is started ")
 
         var pageRequest = PageRequest.of(0, 500)
-        var onePage: Page<Book> = bookRepository.findAll(pageRequest)
-        while (!onePage.isEmpty()) {
+        var onePage: Page<FileMeta> = fileMetaRepository.findAll(pageRequest)
+        while (!onePage.isEmpty) {
             pageRequest = pageRequest.next()
-            for (book in onePage.getContent()) {
-                /*if (book.hash != null) {
+            for (fileMeta in onePage.getContent()) {
+                if (fileMeta.hash.isNotEmpty()) {
                     continue
-                }*/
-                logger.info("Generating hash for: {}", book.name)
+                }
+                logger.info("Generating hash for: {}", fileMeta.name)
                 try {
-                    val file = File(fileProperties.base +"/"+ book.pdfFile?.path)
+                    val file = File(fileProperties.base +"/"+ fileMeta.path)
                     val fi = FileInputStream(file)
                     val fileData = ByteArray(file.length().toInt())
                     fi.read(fileData)
                     fi.close()
                     val hash: String = BigInteger(1, messageDigest.digest(fileData)).toString(16)
-                    //book.hash = hash
-                    book.totalPage = pdfService.getTotalPage(file)
-                    //book.size = file.length()
-                    bookRepository.save(book)
+                    fileMeta.hash = hash
+                    fileMeta.size = file.length()
+                    fileMetaRepository.save(fileMeta)
                 } catch (e: Exception) {
                     logger.warn("Error generating hash: {}", e.message)
                 }
             }
-            onePage = bookRepository.findAll(pageRequest)
+            onePage = fileMetaRepository.findAll(pageRequest)
         }
         logger.info("Generating hash is finished")
     }

@@ -1,4 +1,4 @@
-package com.marufh.pathagar.book.service
+package com.marufh.pathagar.book
 
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.exception.NotFoundException
@@ -16,7 +16,9 @@ class BookServiceTest: BaseTest() {
 
     @BeforeEach
     fun setup() {
+        categoryRepository.deleteAll()
         bookRepository.deleteAll()
+        authorRepository.deleteAll()
         fileMetaRepository.deleteAll()
         Files.deleteIfExists(Path.of(fileProperties.book).resolve("test-book/test-book.pdf"))
     }

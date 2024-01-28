@@ -45,7 +45,7 @@ class AuthorService(
             file = authorDto.file!!,
             fileType = FileType.AUTHOR
         ))
-        val authorImageThumb = imageResizeService.createThumb(Path.of(fileProperties.base +"/"+ authorImage.path), FileType.AUTHOR)
+        val authorImageThumb = imageResizeService.createThumb(Path.of(fileProperties.base +"/"+ authorImage.path), FileType.AUTHOR_THUMB)
 
         return authorMapper.toEntity(authorDto).let {
             it.imageFile = authorImage

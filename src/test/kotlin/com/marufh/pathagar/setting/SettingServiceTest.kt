@@ -1,4 +1,4 @@
-package com.marufh.pathagar.setting.service
+package com.marufh.pathagar.setting
 
 import com.marufh.pathagar.BaseTest
 import org.junit.jupiter.api.Test
