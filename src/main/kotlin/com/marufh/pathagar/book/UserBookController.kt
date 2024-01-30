@@ -29,14 +29,13 @@ class UserBookController(val userBookService: UserBookService) {
         return userBookService.findAll(authentication.toUser(), pageable)
     }
 
+    @GetMapping("/status/{status}")
+    fun getAll(authentication: Authentication, @PathVariable status: String, pageable: Pageable): Page<UserBook> {
+        return userBookService.findAllByStatus(authentication.toUser(), status, pageable)
+    }
+
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: String, authentication: Authentication) {
         userBookService.delete(authentication.toUser(), id)
     }
-
-    /*@PostMapping
-    fun create(@RequestBody userBookDto: UserBookDto, authentication: Authentication): UserBook {
-        return userBookService.create(authentication.toUser(), userBookDto)
-    }*/
-
 }

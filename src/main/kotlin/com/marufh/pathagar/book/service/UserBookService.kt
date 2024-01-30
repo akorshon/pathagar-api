@@ -70,6 +70,12 @@ class UserBookService(
         return userBookRepository.findAll(user.email, pageable)
     }
 
+    fun findAllByStatus( user: User, status: String, pageable: Pageable ): Page<UserBook> {
+        logger.info("Finding all books by status")
+        val readingStatus = UserBookStatus.valueOf(status)
+        return userBookRepository.findAllByStatus(user.email, readingStatus, pageable)
+    }
+
     fun delete(user: User, userBookId: String) {
         userBookRepository.findByUserAndBookId(user.email, userBookId)
             ?.let { userBookRepository.delete(it) }

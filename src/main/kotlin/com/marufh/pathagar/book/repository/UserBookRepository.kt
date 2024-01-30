@@ -1,6 +1,7 @@
 package com.marufh.pathagar.book.repository
 
 import com.marufh.pathagar.book.entity.UserBook
+import com.marufh.pathagar.book.entity.UserBookStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -17,4 +18,9 @@ interface UserBookRepository: JpaRepository<UserBook, String> {
             "join  ub.book b " +
             "WHERE ub.userEmail = ?1")
     fun findAll(userEmail: String, pageable: Pageable): Page<UserBook>
+
+    @Query("SELECT ub FROM UserBook ub " +
+            "join  ub.book b " +
+            "WHERE ub.userEmail = ?1 and ub.status = ?2")
+    fun findAllByStatus(userEmail: String, status: UserBookStatus, pageable: Pageable): Page<UserBook>
 }
