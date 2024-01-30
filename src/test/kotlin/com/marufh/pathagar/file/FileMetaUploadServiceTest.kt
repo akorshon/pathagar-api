@@ -96,9 +96,4 @@ class FileMetaUploadServiceTest: BaseTest() {
        assertTrue(Files.exists(Path.of(fileProperties.book).resolve("test-book2/test-book2.jpg")))
    }
 
-    @Test
-    fun `test file reindex`() {
-        fileUploadService.reindexBook()
-    }
-
 }

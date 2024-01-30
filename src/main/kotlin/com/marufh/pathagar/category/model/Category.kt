@@ -27,7 +27,7 @@ class Category(
     var thumbFile: FileMeta? = null,
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "authors")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
     var books: Set<Book>? = mutableSetOf(),
 
     ): BaseEntity()

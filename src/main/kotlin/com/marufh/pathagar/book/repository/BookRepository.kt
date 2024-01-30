@@ -15,8 +15,8 @@ interface BookRepository: JpaRepository<Book, String> {
     fun findByHash(search: String): Book?
 
     @Query("SELECT b FROM Book b left join b.authors a WHERE a.id = ?1 ")
-    fun findByAuthorId(authorId: String): List<Book>
+    fun findByAuthorId(authorId: String): Set<Book>
 
     @Query("SELECT b FROM Book b left join b.categories c WHERE c.id = ?1 ")
-    fun findByCategoryId(categoryId: String): List<Book>
+    fun findByCategoryId(categoryId: String): Set<Book>
 }

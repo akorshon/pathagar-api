@@ -92,8 +92,8 @@ class CategoryService(
 
         return findById(id).apply {
             books = bookRepository.findByCategoryId(id)
-                .map { bookMapper.toDto(it) }
-                .toList()
+                .map { bookMapper.toWithoutCategoryDto(it) }
+                .toSet()
         }
     }
 
@@ -101,8 +101,15 @@ class CategoryService(
     fun findAll(search: String?,  pageable: Pageable): Page<CategoryDto> {
         logger.info("Finding all categories")
 
-        return categoryRepository.findAll(search, pageable)
-            .map { categoryMapper.toDto(it) }
+        val categoryPage =  categoryRepository.findAll(search, pageable)
+            .map {
+//                it.books = bookRepository.findByCategoryId(it.id!!)
+                categoryMapper.toDto(it)
+            }
+
+        return categoryPage;
+
+
     }
 
     fun delete(id: String) {

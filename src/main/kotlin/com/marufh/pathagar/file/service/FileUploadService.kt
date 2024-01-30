@@ -1,6 +1,5 @@
 package com.marufh.pathagar.file.service
 
-import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.AlreadyExistException
 import com.marufh.pathagar.file.dto.FileDto
@@ -22,7 +21,6 @@ import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import java.time.Instant
-import kotlin.io.path.extension
 import kotlin.io.path.pathString
 
 
@@ -43,8 +41,7 @@ class FileUploadService(
         val hash = getHash(file)
         val size = file.length()
 
-        fileMetaRepository.findByHash(hash!!)?.run {
-            logger.info("file already exist with hash: $hash")
+        fileMetaRepository.findByHash(hash!!)?.let {
             throw AlreadyExistException("File already exist")
         }
 
@@ -87,35 +84,6 @@ class FileUploadService(
     }
 
     fun upload(file: MultipartFile,  path: Path, name: String) = move(file.inputStream, path, name)
-
-    // TODO: need to move this to a separate service
-    fun reindexBook() {
-        println("Reindexing books")
-
-        Files.walk(Path.of(fileProperties.base))
-            .filter(Files::isRegularFile)
-            .filter { p -> !p.fileName.toString().startsWith(".") }
-            .forEach { p ->
-                var fileType: FileType = FileType.BOOK
-                when {
-                    p.pathString.contains("/author/") && !p.pathString.endsWith("thumb.jpg") -> fileType = FileType.AUTHOR
-                    p.pathString.contains("/author/") && p.pathString.endsWith("thumb.jpg") -> fileType = FileType.AUTHOR_THUMB
-                    p.pathString.contains("/book/") && p.pathString.endsWith("pdf") -> fileType = FileType.BOOK
-                    p.pathString.contains("/book/") && p.pathString.endsWith("jpg") -> fileType = FileType.BOOK_THUMB
-                    p.pathString.contains("/category/") && !p.pathString.endsWith("thumb.jpg")  -> fileType = FileType.CATEGORY
-                    p.pathString.contains("/category/") && p.pathString.endsWith("thumb.jpg") -> fileType = FileType.CATEGORY_THUMB
-                }
-
-                val fileMeta = FileMeta(
-                        name = p.fileName.toString(),
-                        fileType = fileType,
-                        path = getRelativePath(p),
-                        hash = getHash(p.toFile())!!,
-                        size = p.toFile().length(),
-                        createdAt = Instant.now()
-                    ).let { fileMetaRepository.save(it) }
-            }
-    }
 
     private fun filePath(fileDto: FileDto) = when(fileDto.fileType) {
         FileType.BOOK -> upload(fileDto.file, Path.of(fileProperties.book), fileDto.file.originalFilename!!)

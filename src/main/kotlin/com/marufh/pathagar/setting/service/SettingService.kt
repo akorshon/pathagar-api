@@ -21,7 +21,7 @@ class SettingService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun generateHash() {
+    /*fun generateHash() {
         logger.info("Generating hash is started ")
 
         var pageRequest = PageRequest.of(0, 500)
@@ -50,7 +50,7 @@ class SettingService(
             onePage = fileMetaRepository.findAll(pageRequest)
         }
         logger.info("Generating hash is finished")
-    }
+    }*/
 
     companion object {
         var messageDigest: MessageDigest

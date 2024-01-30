@@ -9,21 +9,16 @@ import org.springframework.data.domain.PageRequest
 
 
 @JsonIgnoreProperties(ignoreUnknown = true, value = ["pageable"])
-class RestPage<T> : PageImpl<T> {
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    constructor(
-        @JsonProperty("content")
-        content: List<T>?,
+class RestPage<T> @JsonCreator(mode = JsonCreator.Mode.PROPERTIES) constructor(
+    @JsonProperty("content")
+    content: List<T>?,
 
-        @JsonProperty("number")
-        page: Int,
+    @JsonProperty("number")
+    page: Int,
 
-        @JsonProperty("size")
-        size: Int,
+    @JsonProperty("size")
+    size: Int,
 
-        @JsonProperty("totalElements")
-        total: Long
-    ) : super(content!!, PageRequest.of(page, size), total)
-
-    constructor(page: Page<T>) : super(page.getContent(), page.getPageable(), page.getTotalElements())
-}
+    @JsonProperty("totalElements")
+    total: Long
+) : PageImpl<T>(content!!, PageRequest.of(page, size), total)

@@ -18,7 +18,9 @@ class AdminCategoryController(
     }
 
     @PutMapping
-    fun update(@ModelAttribute categoryDto: CategoryDto) = categoryService.update(categoryDto)
+    fun update(@ModelAttribute categoryDto: CategoryDto): CategoryDto {
+        return categoryService.update(categoryDto)
+    }
 
     @GetMapping("/{id}")
     fun getAuthorDetails(@PathVariable id: String) = categoryService.getDetails(id)

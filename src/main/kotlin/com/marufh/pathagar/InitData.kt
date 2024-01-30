@@ -1,4 +1,4 @@
-package com.marufh.pathagar.dev
+package com.marufh.pathagar
 
 import com.marufh.pathagar.auth.entity.Role
 import com.marufh.pathagar.auth.entity.User
@@ -43,8 +43,6 @@ class InitData(
                 password = hashService.hashBcrypt("123456"),
                 roles = setOf(Role.ROLE_USER)
             ).let { userRepository.save(it) }
-
         }
     }
-
 }

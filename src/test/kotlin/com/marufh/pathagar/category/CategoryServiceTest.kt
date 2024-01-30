@@ -1,6 +1,7 @@
 package com.marufh.pathagar.category
 
 import com.marufh.pathagar.BaseTest
+import com.marufh.pathagar.book.service.AuthorAction
 import com.marufh.pathagar.exception.NotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -16,6 +17,7 @@ class CategoryServiceTest: BaseTest() {
 
     @BeforeEach
     fun setup() {
+        bookRepository.deleteAll()
         categoryRepository.deleteAll()
         fileMetaRepository.deleteAll()
         Files.deleteIfExists(Path.of(fileProperties.category).resolve("test-category/test-category.jpg"))
@@ -108,6 +110,7 @@ class CategoryServiceTest: BaseTest() {
     @Test
     fun `test find all`() {
         // Given
+        val book = bookService.create(getBookDto())
         categoryRepository.deleteAll();
         val categoryList = listOf(
             categoryMapper.toEntity(getCategoryDto()),
@@ -118,6 +121,10 @@ class CategoryServiceTest: BaseTest() {
         )
         categoryRepository.saveAll(categoryList)
 
+        for(category in categoryList) {
+          bookService.updateCategory(book.id!!, category.id!!, AuthorAction.ADD.action)
+        }
+
         // When
         val result = categoryService.findAll("", PageRequest.of(0, 10))
 
@@ -125,6 +132,7 @@ class CategoryServiceTest: BaseTest() {
         assert(result is PageImpl)
         assert(result.totalPages == 1)
         assert(result.content.size == 5)
+        assert(result.content[0].books?.size == 1)
     }
 
     @Test

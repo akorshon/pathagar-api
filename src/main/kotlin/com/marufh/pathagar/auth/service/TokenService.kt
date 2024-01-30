@@ -35,8 +35,6 @@ class TokenService(
 
 
     fun parseToken(token: String): User? {
-        //logger.info("Parsing token {}", token)
-
         return try {
             val jwt = jwtDecoder.decode(token)
             val email = jwt.subject
