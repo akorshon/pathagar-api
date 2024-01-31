@@ -36,7 +36,7 @@ class AuthorService(
     fun create(authorDto: AuthorDto): AuthorDto {
         logger.info("Creating author: ${authorDto.name}")
 
-        if(authorDto.file == null) {
+        requireNotNull(authorDto.file) {
             throw IllegalArgumentException("File is required")
         }
 

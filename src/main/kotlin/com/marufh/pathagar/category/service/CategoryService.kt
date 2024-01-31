@@ -35,7 +35,7 @@ class CategoryService(
     fun create(categoryDto: CategoryDto): CategoryDto {
         logger.info("Creating author: ${categoryDto.name}")
 
-        if(categoryDto.file == null) {
+        requireNotNull(categoryDto.file) {
             throw IllegalArgumentException("File is required")
         }
 

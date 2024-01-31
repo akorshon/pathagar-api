@@ -1,7 +1,6 @@
 package com.marufh.pathagar.book.dto
 
 import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.category.dto.CategoryDto
 import com.marufh.pathagar.category.dto.CategoryWithoutBookDto
 import com.marufh.pathagar.file.entity.FileMeta
 import org.springframework.web.multipart.MultipartFile

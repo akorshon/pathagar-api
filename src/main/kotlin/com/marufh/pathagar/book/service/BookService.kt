@@ -34,7 +34,7 @@ class BookService(
     fun create(bookDto: BookDto): BookDto {
         logger.info("Creating book: ${bookDto.name}")
 
-        if(bookDto.file == null) {
+        requireNotNull(bookDto.file) {
             throw IllegalArgumentException("File is required")
         }
 

@@ -1,7 +1,6 @@
 package com.marufh.pathagar.book
 
 import com.marufh.pathagar.book.dto.BookDto
-import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.book.service.BookService
 import org.springframework.data.domain.Pageable
 import org.springframework.security.core.Authentication
@@ -37,9 +36,6 @@ class AdminBookController(
     fun updateCategory(@PathVariable bookId: String, @PathVariable categoryId: String, @PathVariable action: String): BookDto {
         return bookService.updateCategory(bookId, categoryId, action)
     }
-
-    //@PostMapping("{bookId}/thumb/{page}")
-    //fun updateThumb(@PathVariable bookId: String, @PathVariable page: Int): Book = fileUploadService.updateThumb(bookId, page)
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: String) = bookService.delete(id)

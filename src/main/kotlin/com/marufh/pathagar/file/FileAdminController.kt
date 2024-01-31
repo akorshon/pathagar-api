@@ -21,35 +21,4 @@ class FileAdminController(
     fun update(@ModelAttribute fileDto: FileDto): FileMeta {
         return fileUploadService.updateFile(fileDto)
     }
-
-
-    /*@PostMapping("/book")
-    fun createBook(@ModelAttribute fileDto: FileDto): BookDto {
-        return fileUploadService.createBookFile(fileDto)
-    }
-
-    @PutMapping("/book")
-    fun updateBook(@ModelAttribute fileDto: FileDto): BookDto {
-      return fileUploadService.updateBookFile(fileDto)
-    }
-
-    @PostMapping("/author")
-    fun createAuthor(@ModelAttribute fileDto: FileDto): AuthorDto {
-      return fileUploadService.createAuthorFile(fileDto)
-    }
-
-    @PutMapping("/author")
-    fun updateAuthor(@ModelAttribute fileDto: FileDto): AuthorDto {
-      return fileUploadService.updateAuthorFile(fileDto)
-    }
-
-    @PostMapping("/category")
-    fun createCategory(@ModelAttribute fileDto: FileDto): CategoryDto {
-        return fileUploadService.createCategoryFile(fileDto)
-    }
-
-    @PutMapping("/category")
-    fun updateCategory(@ModelAttribute fileDto: FileDto): CategoryDto {
-        return fileUploadService.updateCategoryFile(fileDto)
-    }*/
 }
