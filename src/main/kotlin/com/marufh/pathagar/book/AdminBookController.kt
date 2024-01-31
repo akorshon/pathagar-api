@@ -23,7 +23,7 @@ class AdminBookController(
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: String): BookDto {
-      return bookService.findById(id);
+      return bookService.findById(id)
     }
 
     @GetMapping

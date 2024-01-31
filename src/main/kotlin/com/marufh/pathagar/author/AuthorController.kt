@@ -18,6 +18,6 @@ class AuthorController(val authorService: AuthorService) {
 
     @GetMapping
     fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable) = ResponseEntity
-        .ok(authorService.findAll(search, pageable));
+        .ok(authorService.findAll(search, pageable))
 
 }

@@ -10,17 +10,13 @@ import java.awt.Dimension
 import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
-import java.math.BigInteger
 import java.nio.file.Path
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.time.Instant
 import javax.imageio.ImageIO
 
 @Service
 class ImageResizeService(
+    private val fileService: FileService,
     private val fileMetaRepository: FileMetaRepository,
     private val fileProperties: FileProperties) {
 
@@ -36,7 +32,7 @@ class ImageResizeService(
             name = thumb.fileName.toString(),
             fileType = fileType,
             path = getRelativePath(thumb),
-            hash = getHash(thumb.toFile()),
+            hash = fileService.getHash(thumb.toFile()),
             size = thumb.toFile().length(),
             createdAt = Instant.now()
         ).let { fileMetaRepository.save(it) }
@@ -50,7 +46,7 @@ class ImageResizeService(
         val boundary = Dimension(width, height)
         val dimension = getScaledDimension(imgSize, boundary)
 
-        val x = (boundary.getWidth() - dimension!!.getWidth()).toInt() / 2
+        val x = (boundary.getWidth() - dimension.getWidth()).toInt() / 2
         val y = (boundary.getHeight() - dimension.getHeight()).toInt() / 2
 
         img.createGraphics().drawImage(bi.getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH), x, y, null)
@@ -58,7 +54,7 @@ class ImageResizeService(
         return file.toPath()
     }
 
-    private fun getScaledDimension(imgSize: Dimension, boundary: Dimension): Dimension? {
+    private fun getScaledDimension(imgSize: Dimension, boundary: Dimension): Dimension {
         val originalWidth = imgSize.width
         val originalHeight = imgSize.height
         val boundWidth = boundary.width
@@ -89,28 +85,4 @@ class ImageResizeService(
     private fun getRelativePath(filePath: Path): String {
         return Path.of(fileProperties.base).relativize(filePath).toString()
     }
-
-    private fun getHash(file: File): String {
-        return try {
-            val fi = FileInputStream(file)
-            val fileData = ByteArray(file.length().toInt())
-            fi.read(fileData)
-            fi.close()
-            BigInteger(1, messageDigest.digest(fileData)).toString(16)
-        } catch (e: IOException) {
-            throw java.lang.RuntimeException(e)
-        }
-    }
-
-    companion object {
-        var messageDigest: MessageDigest
-        init {
-            try {
-                messageDigest = MessageDigest.getInstance("SHA-512");
-            } catch (e: NoSuchAlgorithmException) {
-                throw RuntimeException ("cannot initialize SHA-512 hash function", e);
-            }
-        }
-    }
-
 }

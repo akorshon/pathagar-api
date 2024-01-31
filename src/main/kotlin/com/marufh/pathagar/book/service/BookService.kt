@@ -147,7 +147,7 @@ class BookService(
             Files.delete(Path.of(fileProperties.base, book.pdfFile?.path))
             Files.delete(Path.of(fileProperties.base, book.coverImage?.path))
             Files.delete(Path.of(fileProperties.base, book.pdfFile?.path).parent)
-            bookRepository.delete(book);
+            bookRepository.delete(book)
         } else {
             // Soft delete
             book.deleted = true

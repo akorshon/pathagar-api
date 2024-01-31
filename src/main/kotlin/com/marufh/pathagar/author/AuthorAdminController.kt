@@ -27,7 +27,7 @@ class AuthorAdminController(
       return authorService.getAuthorDetails(id)
     }
 
-    @GetMapping()
+    @GetMapping
     fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<AuthorDto> {
       return authorService.findAll(search, pageable)
     }

@@ -10,22 +10,16 @@ import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
 import java.io.InputStream
-import java.math.BigInteger
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.time.Instant
-import kotlin.io.path.pathString
 
 
 @Service
 class FileUploadService(
+    private val fileService: FileService,
     private val fileProperties: FileProperties,
     private val fileMetaRepository: FileMetaRepository) {
 
@@ -38,10 +32,10 @@ class FileUploadService(
 
         val filePath = filePath(fileDto)
         val file = filePath.toFile()
-        val hash = getHash(file)
+        val hash = fileService.getHash(file)
         val size = file.length()
 
-        fileMetaRepository.findByHash(hash!!)?.let {
+        fileMetaRepository.findByHash(hash)?.let {
             throw AlreadyExistException("File already exist")
         }
 
@@ -59,14 +53,14 @@ class FileUploadService(
         logger.info("Updating file: ${fileDto.file.originalFilename}")
 
         val fileMeta = fileMetaRepository.findById(fileDto.id!!)
-            .orElseThrow() { EntityNotFoundException("File not found with id: ${fileDto.id}") }
+            .orElseThrow { EntityNotFoundException("File not found with id: ${fileDto.id}") }
 
         val filePath = filePath(fileDto)
         val file = filePath.toFile()
-        val hash = getHash(file)
+        val hash = fileService.getHash(file)
         val size = file.length()
 
-        fileMetaRepository.findByHash(hash!!)?.run {
+        fileMetaRepository.findByHash(hash)?.run {
             logger.info("File already exist with hash: $hash")
             throw AlreadyExistException("Book already exist")
         }
@@ -100,33 +94,11 @@ class FileUploadService(
 
     private fun getFinalPath(path: Path, name: String): Path {
         val subDirectory = name.replace("\\.[^/.]+\$".toRegex(), "").trim().replace("\\s+".toRegex(), "_")
-        return path.resolve(subDirectory).apply { Files.createDirectories(this) }.resolve(name);
+        return path.resolve(subDirectory).apply { Files.createDirectories(this) }.resolve(name)
     }
 
     private fun getRelativePath(filePath: Path): String {
         return Path.of(fileProperties.base).relativize(filePath).toString()
     }
 
-    private fun getHash(file: File): String? {
-        return try {
-            val fi = FileInputStream(file)
-            val fileData = ByteArray(file.length().toInt())
-            fi.read(fileData)
-            fi.close()
-            BigInteger(1, messageDigest.digest(fileData)).toString(16)
-        } catch (e: IOException) {
-            throw java.lang.RuntimeException(e)
-        }
-    }
-
-    companion object {
-        var messageDigest: MessageDigest
-        init {
-            try {
-                messageDigest = MessageDigest.getInstance("SHA-512");
-            } catch (e: NoSuchAlgorithmException) {
-                throw RuntimeException ("cannot initialize SHA-512 hash function", e);
-            }
-        }
-    }
 }

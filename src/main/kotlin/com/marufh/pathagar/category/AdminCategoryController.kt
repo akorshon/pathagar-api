@@ -25,7 +25,7 @@ class AdminCategoryController(
     @GetMapping("/{id}")
     fun getAuthorDetails(@PathVariable id: String) = categoryService.getDetails(id)
 
-    @GetMapping()
+    @GetMapping
     fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<CategoryDto> {
         return categoryService.findAll(search, pageable)
     }

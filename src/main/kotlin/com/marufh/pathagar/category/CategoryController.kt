@@ -21,6 +21,6 @@ class CategoryController(val categoryService: CategoryService) {
 
     @GetMapping
     fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable) = ResponseEntity
-        .ok(categoryService.findAll(search, pageable));
+        .ok(categoryService.findAll(search, pageable))
 
 }

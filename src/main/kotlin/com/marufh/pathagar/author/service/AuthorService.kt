@@ -10,6 +10,7 @@ import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.service.FileService
 import com.marufh.pathagar.file.service.FileUploadService
 import com.marufh.pathagar.file.service.ImageResizeService
 import org.slf4j.LoggerFactory
@@ -22,6 +23,7 @@ import java.nio.file.Path
 
 @Service
 class AuthorService(
+    private val fileService: FileService,
     private val imageResizeService: ImageResizeService,
     private val fileUploadService: FileUploadService,
     private val bookRepository: BookRepository,
@@ -112,10 +114,8 @@ class AuthorService(
             .orElseThrow{ NotFoundException("Author not found with id: $id") }
 
         if(author.deleted) {
-            Files.delete(Path.of(fileProperties.base, author.imageFile?.path))
-            Files.delete(Path.of(fileProperties.base,author.thumbFile?.path))
-            Files.delete(Path.of(fileProperties.base, author.imageFile?.path).parent)
-            authorRepository.delete(author);
+            fileService.deleteFiles(author.imageFile?.path!!, author.thumbFile?.path!!)
+            authorRepository.delete(author)
         } else {
             author.deleted = true
             authorRepository.save(author)

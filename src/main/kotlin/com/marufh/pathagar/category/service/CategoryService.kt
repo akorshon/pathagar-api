@@ -9,9 +9,9 @@ import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.service.FileService
 import com.marufh.pathagar.file.service.FileUploadService
 import com.marufh.pathagar.file.service.ImageResizeService
-import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,6 +22,7 @@ import java.nio.file.Path
 
 @Service
 class CategoryService(
+    private val fileService: FileService,
     private val imageResizeService: ImageResizeService,
     private val fileUploadService: FileUploadService,
     private val bookRepository: BookRepository,
@@ -107,7 +108,7 @@ class CategoryService(
                 categoryMapper.toDto(it)
             }
 
-        return categoryPage;
+        return categoryPage
 
 
     }
@@ -119,10 +120,8 @@ class CategoryService(
             .orElseThrow{ NotFoundException("Category not found with id: $id") }
 
         if(category.deleted) {
-            Files.delete(Path.of(fileProperties.base, category.imageFile?.path))
-            Files.delete(Path.of(fileProperties.base, category.thumbFile?.path))
-            Files.delete(Path.of(fileProperties.base, category.imageFile?.path).parent)
-            categoryRepository.delete(category);
+            fileService.deleteFiles(category.imageFile?.path!!, category.thumbFile?.path!!)
+            categoryRepository.delete(category)
         } else {
             category.deleted = true
             categoryRepository.save(category)

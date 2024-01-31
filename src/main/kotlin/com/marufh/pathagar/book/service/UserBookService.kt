@@ -32,7 +32,7 @@ class UserBookService(
             rating = null,
             status = UserBookStatus.READING,
             started = Instant.now()
-        );
+        )
         return userBookRepository.save(userBook)
     }
 

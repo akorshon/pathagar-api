@@ -6,7 +6,6 @@ import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.service.UserBookService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
