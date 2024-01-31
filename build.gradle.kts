@@ -4,6 +4,7 @@ plugins {
 	id("org.springframework.boot") version "3.0.6"
 	id("io.spring.dependency-management") version "1.1.0"
 	id ("org.sonarqube") version "4.2.1.3168"
+	id ("jacoco")
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 	kotlin("plugin.jpa") version "1.7.22"
@@ -66,3 +67,8 @@ tasks.bootRun {
 	args("--spring.profiles.active=dev")
 }
 
+tasks.jacocoTestReport {
+	reports {
+		xml.required.set(true)
+	}
+}
