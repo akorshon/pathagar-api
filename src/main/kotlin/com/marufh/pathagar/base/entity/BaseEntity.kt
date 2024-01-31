@@ -12,4 +12,6 @@ open class BaseEntity (
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(length = 36, name = "id")
     var id: String? = null
+
+
 )
