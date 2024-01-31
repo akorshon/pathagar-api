@@ -22,10 +22,10 @@ class PdfService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun convertToThumb(filePath: Path, path: Path): Path {
+    /*fun convertToThumb(filePath: Path, path: Path): Path {
         logger.info("Converting pdf to thumb: $filePath")
        return convertToThumbFromPage(filePath, path, 0)
-    }
+    }*/
 
     fun getTotalPage(file:File): Int {
         return PDDocument.load(file).numberOfPages

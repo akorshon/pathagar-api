@@ -25,8 +25,6 @@ class FileUploadService(
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val fileNameRegex = "\\.[^/.]+$"
-
     fun createFile(fileDto: FileDto): FileMeta {
         logger.info("Uploading  file: ${fileDto.file.originalFilename}")
 

@@ -11,8 +11,8 @@ interface BookRepository: JpaRepository<Book, String> {
     @Query("SELECT b FROM Book b WHERE ( ?1 is null or b.name LIKE %?1% ) ")
     fun findAll(search: String?, pageable: Pageable): Page<Book>
 
-    @Query("SELECT b FROM Book b WHERE b.pdfFile.hash = ?1 ")
-    fun findByHash(search: String): Book?
+    //@Query("SELECT b FROM Book b WHERE b.pdfFile.hash = ?1 ")
+    //fun findByHash(search: String): Book?
 
     @Query("SELECT b FROM Book b left join b.authors a WHERE a.id = ?1 ")
     fun findByAuthorId(authorId: String): Set<Book>
