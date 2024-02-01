@@ -2,6 +2,8 @@ package com.marufh.pathagar.book
 
 import com.marufh.pathagar.auth.config.toUser
 import com.marufh.pathagar.book.dto.UserBookDto
+import com.marufh.pathagar.book.dto.UserBookRequest
+import com.marufh.pathagar.book.dto.UserBookResponse
 import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.service.UserBookService
 import org.springframework.data.domain.Page
@@ -14,23 +16,23 @@ import org.springframework.web.bind.annotation.*
 class UserBookController(val userBookService: UserBookService) {
 
     @PutMapping
-    fun update(@RequestBody userBookDto: UserBookDto,
-               authentication: Authentication): UserBook =
-        userBookService.update(authentication.toUser(), userBookDto)
+    fun update(@RequestBody userBookRequest: UserBookRequest,
+               authentication: Authentication): UserBookResponse =
+        userBookService.update(authentication.toUser(), userBookRequest)
 
     @GetMapping("/book/{bookId}")
     fun getByUserAndBookId(@PathVariable bookId: String,
-                           authentication: Authentication): UserBook =
+                           authentication: Authentication): UserBookResponse =
         userBookService.findByUserAndBookId(authentication.toUser(), bookId)
 
     @GetMapping
-    fun getAll(authentication: Authentication, pageable: Pageable): Page<UserBook> =
+    fun getAll(authentication: Authentication, pageable: Pageable): Page<UserBookResponse> =
         userBookService.findAll(authentication.toUser(), pageable)
 
     @GetMapping("/status/{status}")
     fun getAll(authentication: Authentication,
                @PathVariable status: String,
-               pageable: Pageable): Page<UserBook> =
+               pageable: Pageable): Page<UserBookResponse> =
         userBookService.findAllByStatus(authentication.toUser(), status, pageable)
 
     @DeleteMapping("/{id}")
