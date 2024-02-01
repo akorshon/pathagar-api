@@ -14,27 +14,26 @@ import org.springframework.web.bind.annotation.*
 class UserBookController(val userBookService: UserBookService) {
 
     @PutMapping
-    fun update(@RequestBody userBookDto: UserBookDto, authentication: Authentication): UserBook {
-        return userBookService.update(authentication.toUser(), userBookDto)
-    }
+    fun update(@RequestBody userBookDto: UserBookDto,
+               authentication: Authentication): UserBook =
+        userBookService.update(authentication.toUser(), userBookDto)
 
     @GetMapping("/book/{bookId}")
-    fun getByUserAndBookId(@PathVariable bookId: String, authentication: Authentication): UserBook {
-        return userBookService.findByUserAndBookId(authentication.toUser(), bookId)
-    }
+    fun getByUserAndBookId(@PathVariable bookId: String,
+                           authentication: Authentication): UserBook =
+        userBookService.findByUserAndBookId(authentication.toUser(), bookId)
 
     @GetMapping
-    fun getAll(authentication: Authentication, pageable: Pageable): Page<UserBook> {
-        return userBookService.findAll(authentication.toUser(), pageable)
-    }
+    fun getAll(authentication: Authentication, pageable: Pageable): Page<UserBook> =
+        userBookService.findAll(authentication.toUser(), pageable)
 
     @GetMapping("/status/{status}")
-    fun getAll(authentication: Authentication, @PathVariable status: String, pageable: Pageable): Page<UserBook> {
-        return userBookService.findAllByStatus(authentication.toUser(), status, pageable)
-    }
+    fun getAll(authentication: Authentication,
+               @PathVariable status: String,
+               pageable: Pageable): Page<UserBook> =
+        userBookService.findAllByStatus(authentication.toUser(), status, pageable)
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: String, authentication: Authentication) {
+    fun delete(@PathVariable id: String, authentication: Authentication) =
         userBookService.delete(authentication.toUser(), id)
-    }
 }

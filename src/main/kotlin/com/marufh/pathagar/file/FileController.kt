@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 class FileController(private val fileDownloadService: FileDownloadService) {
 
     @GetMapping("/{path}/{subPath}/{fileName}")
-    fun getFile(@PathVariable path: String, @PathVariable subPath: String, @PathVariable fileName: String): ResponseEntity<Resource> {
-        return fileDownloadService.getFile("/$path/$subPath/$fileName")
-    }
-
+    fun getFile(@PathVariable path: String, @PathVariable subPath: String, @PathVariable fileName: String): ResponseEntity<Resource> =
+        fileDownloadService.getFile("/$path/$subPath/$fileName")
 }

@@ -9,26 +9,20 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/admin/categories")
 class AdminCategoryController(
-    private val categoryService: CategoryService
-) {
+    private val categoryService: CategoryService) {
 
     @PostMapping
-    fun create(@ModelAttribute categoryDto: CategoryDto): CategoryDto {
-        return categoryService.create(categoryDto)
-    }
+    fun create(@ModelAttribute categoryDto: CategoryDto): CategoryDto = categoryService.create(categoryDto)
 
     @PutMapping
-    fun update(@ModelAttribute categoryDto: CategoryDto): CategoryDto {
-        return categoryService.update(categoryDto)
-    }
+    fun update(@ModelAttribute categoryDto: CategoryDto): CategoryDto = categoryService.update(categoryDto)
 
     @GetMapping("/{id}")
-    fun getAuthorDetails(@PathVariable id: String) = categoryService.getDetails(id)
+    fun getAuthorDetails(@PathVariable id: String): CategoryDto = categoryService.getDetails(id)
 
     @GetMapping
-    fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<CategoryDto> {
-        return categoryService.findAll(search, pageable)
-    }
+    fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<CategoryDto> =
+        categoryService.findAll(search, pageable)
 
     @DeleteMapping("/{id}")
     fun delete(@PathVariable id: String) = categoryService.delete(id)

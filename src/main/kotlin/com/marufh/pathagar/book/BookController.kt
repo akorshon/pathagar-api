@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class BookController(val bookService: BookService) {
 
     @GetMapping
-    fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable, authentication: Authentication): Page<BookDto> {
-        return bookService.findAll(search, pageable)
-    }
-
+    fun getAll(@RequestParam(required = false) search: String?,
+               pageable: Pageable,
+               authentication: Authentication): Page<BookDto> = bookService.findAll(search, pageable)
 }

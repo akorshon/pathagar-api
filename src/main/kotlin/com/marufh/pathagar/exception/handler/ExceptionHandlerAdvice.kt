@@ -1,5 +1,6 @@
-package com.marufh.pathagar.exception
+package com.marufh.pathagar.exception.handler
 
+import com.marufh.pathagar.exception.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.Errors
