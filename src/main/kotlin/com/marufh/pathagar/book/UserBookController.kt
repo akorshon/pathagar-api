@@ -1,10 +1,8 @@
 package com.marufh.pathagar.book
 
 import com.marufh.pathagar.auth.config.toUser
-import com.marufh.pathagar.book.dto.UserBookDto
 import com.marufh.pathagar.book.dto.UserBookRequest
 import com.marufh.pathagar.book.dto.UserBookResponse
-import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.service.UserBookService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

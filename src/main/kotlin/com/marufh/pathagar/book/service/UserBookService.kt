@@ -1,7 +1,6 @@
 package com.marufh.pathagar.book.service
 
 import com.marufh.pathagar.auth.entity.User
-import com.marufh.pathagar.book.dto.UserBookDto
 import com.marufh.pathagar.book.dto.UserBookRequest
 import com.marufh.pathagar.book.dto.UserBookResponse
 import com.marufh.pathagar.book.entity.Book
@@ -15,7 +14,6 @@ import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.Instant
 

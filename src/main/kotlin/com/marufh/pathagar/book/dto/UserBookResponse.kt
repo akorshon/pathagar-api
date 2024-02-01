@@ -6,6 +6,7 @@ import java.time.Instant
 data class UserBookResponse(
     val id: String? = null,
     val book: BookResponse,
+    var userEmail:String,
     var page:Int,
     var status: UserBookStatus,
     val started:Instant ? = null,

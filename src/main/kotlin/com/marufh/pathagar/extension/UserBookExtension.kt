@@ -6,6 +6,7 @@ import com.marufh.pathagar.book.entity.UserBook
 fun UserBook.toUserBookResponse() = UserBookResponse(
     id = id,
     book = book.toBookResponse(),
+    userEmail = userEmail,
     page = page,
     status = status,
     started = started,

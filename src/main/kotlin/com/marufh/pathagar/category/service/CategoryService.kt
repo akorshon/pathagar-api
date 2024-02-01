@@ -111,11 +111,11 @@ class CategoryService(
     fun findAllDetails(search: String?,  pageable: Pageable): Page<CategoryDetailsResponse> {
         logger.info("Finding all categories")
 
-        val ListOfCdr = categoryRepository.findAll(search, pageable).content
+        val listOfCategory = categoryRepository.findAll(search, pageable).content
             .filter { it.books?.isNotEmpty()!! }
             .map { it.toCategoryDetailsResponse() }
 
-        return PageImpl(ListOfCdr, pageable, ListOfCdr.size.toLong())
+        return PageImpl(listOfCategory, pageable, listOfCategory.size.toLong())
     }
 
     fun delete(id: String) {
