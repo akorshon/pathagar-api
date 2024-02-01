@@ -16,6 +16,7 @@ import com.marufh.pathagar.file.service.FileUploadService
 import com.marufh.pathagar.file.service.ImageResizeService
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -110,8 +111,11 @@ class CategoryService(
     fun findAllDetails(search: String?,  pageable: Pageable): Page<CategoryDetailsResponse> {
         logger.info("Finding all categories")
 
-        return categoryRepository.findAll(search, pageable)
+        val ListOfCdr = categoryRepository.findAll(search, pageable).content
+            .filter { it.books?.isNotEmpty()!! }
             .map { it.toCategoryDetailsResponse() }
+
+        return PageImpl(ListOfCdr, pageable, ListOfCdr.size.toLong())
     }
 
     fun delete(id: String) {
