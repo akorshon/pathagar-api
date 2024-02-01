@@ -8,15 +8,15 @@ fun Category.toCategoryResponse() = CategoryResponse(
     id = id,
     name = name,
     description = description,
-    imageFile = imageFile,
-    thumbFile = thumbFile,
+    imageFile = imageFile?.toFileMetaResponse(),
+    thumbFile = thumbFile?.toFileMetaResponse(),
 )
 
 fun Category.toCategoryDetailsResponse() = CategoryDetailsResponse(
     id = id,
     name = name,
     description = description,
-    imageFile = imageFile,
-    thumbFile = thumbFile,
+    imageFile = imageFile?.toFileMetaResponse(),
+    thumbFile = thumbFile?.toFileMetaResponse(),
     books = books?.map { it.toBookResponse() }?.toSet(),
 )

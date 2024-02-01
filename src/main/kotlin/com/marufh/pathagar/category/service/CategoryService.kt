@@ -106,6 +106,14 @@ class CategoryService(
             .map { it.toCategoryResponse() }
     }
 
+    @Transactional
+    fun findAllDetails(search: String?,  pageable: Pageable): Page<CategoryDetailsResponse> {
+        logger.info("Finding all categories")
+
+        return categoryRepository.findAll(search, pageable)
+            .map { it.toCategoryDetailsResponse() }
+    }
+
     fun delete(id: String) {
         logger.info("Deleting category by id: $id")
 

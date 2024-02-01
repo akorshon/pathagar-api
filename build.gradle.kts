@@ -8,18 +8,11 @@ plugins {
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 	kotlin("plugin.jpa") version "1.7.22"
-	//kotlin("kapt") version "1.6.21"
 }
 
 group = "com.marufh"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
-
-configurations {
-	compileOnly {
-		extendsFrom(configurations.annotationProcessor.get())
-	}
-}
 
 repositories {
 	mavenCentral()
@@ -35,7 +28,6 @@ dependencies {
 	implementation("org.apache.pdfbox:jbig2-imageio:3.0.2")
 	implementation("com.github.jai-imageio:jai-imageio-core:1.4.0")
 	implementation("com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0")
-	//implementation("org.mapstruct:mapstruct:1.5.2.Final")
 
 	runtimeOnly("com.mysql:mysql-connector-j")
 
@@ -45,11 +37,7 @@ dependencies {
 	testImplementation("org.testcontainers:mysql:1.17.6")
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	//compileOnly("org.projectlombok:lombok")
-	//annotationProcessor("org.projectlombok:lombok")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-
-	//kapt("org.mapstruct:mapstruct-processor:1.5.2.Final")
 }
 
 tasks.withType<KotlinCompile> {

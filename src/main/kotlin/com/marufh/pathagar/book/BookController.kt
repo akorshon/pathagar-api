@@ -1,6 +1,5 @@
 package com.marufh.pathagar.book
 
-import com.marufh.pathagar.book.dto.BookDto
 import com.marufh.pathagar.book.dto.BookResponse
 import com.marufh.pathagar.book.service.BookService
 import org.springframework.data.domain.Page

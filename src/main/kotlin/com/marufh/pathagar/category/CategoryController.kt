@@ -18,4 +18,8 @@ class CategoryController(val categoryService: CategoryService) {
     fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<CategoryResponse> =
         categoryService.findAll(search, pageable)
 
+    @GetMapping("/details")
+    fun getAllDetails(@RequestParam(required = false) search: String?, pageable: Pageable): Page<CategoryDetailsResponse> =
+        categoryService.findAllDetails(search, pageable)
+
 }

@@ -3,8 +3,8 @@ package com.marufh.pathagar.author
 import com.fasterxml.jackson.core.type.TypeReference
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.RestPage
-import com.marufh.pathagar.author.dto.AuthorCreateRequest
-import com.marufh.pathagar.author.dto.AuthorDto
+import com.marufh.pathagar.author.dto.AuthorDetailsResponse
+import com.marufh.pathagar.author.dto.AuthorResponse
 import com.marufh.pathagar.author.entity.Author
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
@@ -38,7 +38,7 @@ class CategoryControllerTest: BaseTest() {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn().response
             .contentAsString.let {
-                objectMapper.readValue(it, object : TypeReference<RestPage<AuthorDto>>() {})
+                objectMapper.readValue(it, object : TypeReference<RestPage<AuthorResponse>>() {})
             }
 
         // Then
@@ -58,7 +58,7 @@ class CategoryControllerTest: BaseTest() {
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn().response
-            .contentAsString.let { objectMapper.readValue(it, AuthorDto::class.java) }
+            .contentAsString.let { objectMapper.readValue(it, AuthorDetailsResponse::class.java) }
 
         // Then
         assert(author.id == authorEntity.id)

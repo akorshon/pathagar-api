@@ -2,7 +2,6 @@ package com.marufh.pathagar.category
 
 import com.marufh.pathagar.category.dto.CategoryCreateRequest
 import com.marufh.pathagar.category.dto.CategoryDetailsResponse
-import com.marufh.pathagar.category.dto.CategoryDto
 import com.marufh.pathagar.category.dto.CategoryResponse
 import com.marufh.pathagar.category.service.CategoryService
 import org.springframework.data.domain.Page
