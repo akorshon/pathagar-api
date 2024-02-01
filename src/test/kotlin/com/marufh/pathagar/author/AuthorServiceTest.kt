@@ -1,6 +1,8 @@
 package com.marufh.pathagar.author
 
 import com.marufh.pathagar.BaseTest
+import com.marufh.pathagar.author.dto.AuthorCreateRequest
+import com.marufh.pathagar.author.entity.Author
 import com.marufh.pathagar.exception.NotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,6 +16,7 @@ class AuthorServiceTest: BaseTest() {
 
     @BeforeEach
     fun setup() {
+        println("Cleaning up")
         bookRepository.deleteAll()
         authorRepository.deleteAll()
         categoryRepository.deleteAll()
@@ -24,16 +27,15 @@ class AuthorServiceTest: BaseTest() {
     @Test
     fun `test create author`() {
         // Given
-        val authorDto = getAuthorDto()
+        val authorCreateRequest = getAuthorDto()
 
         // When
-        val result  = authorService.create(authorDto)
+        val result  = authorService.create(authorCreateRequest)
 
         // Then
         assert(result.id != null)
-        assert(result.name == authorDto.name)
-        assert(result.description == authorDto.description)
-        assert(result.deleted == authorDto.deleted)
+        assert(result.name == authorCreateRequest.name)
+        assert(result.description == authorCreateRequest.description)
         assert(result.imageFile?.path == "author/test-author/test-author.jpg")
         assert(result.thumbFile?.path == "author/test-author/test-author_thumb.jpg")
     }
@@ -57,18 +59,26 @@ class AuthorServiceTest: BaseTest() {
     @Test
     fun `test update  author`() {
         // Given
-        val authorDto = authorService.create(getAuthorDto())
-        authorDto.name = "Updated Author Name" + UUID.randomUUID().toString()
-        authorDto.description = "Updated Author Description"
+        val authorCreateRequest = getAuthorDto()
+
+
+        val authorResponse = authorService.create(authorCreateRequest)
 
         // When
-        val result = authorService.update(authorDto)
+        val updateName = "Updated Author Name" + UUID.randomUUID().toString()
+        val updateDescription = "Updated Author Description"
+        val result = authorService.update(AuthorCreateRequest(
+                id = authorResponse.id,
+                name = updateName,
+                description = updateDescription,
+                file = null
+            )
+        )
 
         // Then
         assert(result.id != null)
-        assert(result.name == authorDto.name)
-        assert(result.description == authorDto.description)
-        assert(result.deleted == authorDto.deleted)
+        assert(result.name == updateName)
+        assert(result.description == updateDescription)
         assert(result.imageFile?.path == "author/test-author/test-author.jpg")
         assert(result.thumbFile?.path == "author/test-author/test-author_thumb.jpg")
     }
@@ -76,12 +86,12 @@ class AuthorServiceTest: BaseTest() {
     @Test
     fun `test update author not found exception`() {
         // Given
-        val authorDto = getAuthorDto();
-        authorDto.id = "invalid-id"
+        val authorCreateRequest = getAuthorDto();
+        authorCreateRequest.id = "invalid-id"
 
         // When
         val exception = assertThrows<NotFoundException> {
-            authorService.update(authorDto)
+            authorService.update(authorCreateRequest)
         }
 
         // Then
@@ -102,7 +112,6 @@ class AuthorServiceTest: BaseTest() {
         assert(authorDetailsDto.id != null)
         assert(authorDetailsDto.name == authorDto.name)
         assert(authorDetailsDto.description == authorDto.description)
-        assert(authorDetailsDto.deleted == authorDto.deleted)
     }
 
     @Test
@@ -119,16 +128,13 @@ class AuthorServiceTest: BaseTest() {
     @Test
     fun `test get all authors`() {
         // Given
-        bookRepository.deleteAll()
-        authorRepository.deleteAll()
-        val authorList = listOf(
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-        )
-        authorRepository.saveAll(authorList)
+        listOf(
+            Author(name = "test author1", description = "test description1"),
+            Author(name = "test author2", description = "test description2"),
+            Author(name = "test author3", description = "test description3"),
+            Author(name = "test author4", description = "test description4"),
+            Author(name = "test author5", description = "test description5"),
+        ).map { authorRepository.save(it) }
 
         // When
         val authorDtoPage = authorService.findAll("", PageRequest.of(0, 10))
@@ -169,9 +175,7 @@ class AuthorServiceTest: BaseTest() {
         // Then
         assert(Files.exists(Path.of(fileProperties.author).resolve("test-author/test-author.jpg")))
         assert(Files.exists(Path.of(fileProperties.author).resolve("test-author/test-author_thumb.jpg")))
-        authorService.findById(authorDto.id!!).let {
-            assert(it.deleted == true)
-        }
+        //authorService.findById(authorDto.id!!)
     }
 
     @Test

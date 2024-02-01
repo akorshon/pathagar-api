@@ -1,13 +1,16 @@
 package com.marufh.pathagar.author.service
 
-import com.marufh.pathagar.author.dto.AuthorDetailsDto
-import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.author.dto.AuthorMapper
+import com.marufh.pathagar.author.dto.AuthorCreateRequest
+import com.marufh.pathagar.author.dto.AuthorDetailsResponse
+import com.marufh.pathagar.author.dto.AuthorResponse
+import com.marufh.pathagar.author.entity.Author
 import com.marufh.pathagar.author.repository.AuthorRepository
-import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
+import com.marufh.pathagar.extension.toAuthorDetailsResponse
+import com.marufh.pathagar.extension.toAuthorResponse
+import com.marufh.pathagar.extension.toBookResponse
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
 import com.marufh.pathagar.file.service.FileService
@@ -16,6 +19,7 @@ import com.marufh.pathagar.file.service.ImageResizeService
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.nio.file.Path
@@ -27,82 +31,83 @@ class AuthorService(
     private val fileUploadService: FileUploadService,
     private val bookRepository: BookRepository,
     private val fileProperties: FileProperties,
-    private val authorMapper: AuthorMapper,
-    private val bookMapper: BookMapper,
     private val authorRepository: AuthorRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun create(authorDto: AuthorDto): AuthorDto {
-        logger.info("Creating author: ${authorDto.name}")
+    fun create(authorCreateRequest: AuthorCreateRequest): AuthorResponse {
+        logger.info("Creating author: ${authorCreateRequest.name}")
 
-        requireNotNull(authorDto.file) {
+        requireNotNull(authorCreateRequest.file) {
             throw IllegalArgumentException("File is required")
         }
 
         val authorImage = fileUploadService.createFile(FileDto(
-            name = authorDto.name,
-            file = authorDto.file!!,
+            name = authorCreateRequest.name,
+            file = authorCreateRequest.file!!,
             fileType = FileType.AUTHOR
         ))
         val authorImageThumb = imageResizeService.createThumb(Path.of(fileProperties.base +"/"+ authorImage.path), FileType.AUTHOR_THUMB)
 
-        return authorMapper.toEntity(authorDto).let {
-            it.imageFile = authorImage
-            it.thumbFile = authorImageThumb
-            authorMapper.toDto(authorRepository.save(it))
+        return Author(
+            name = authorCreateRequest.name,
+            description = authorCreateRequest.description,
+            imageFile = authorImage,
+            thumbFile = authorImageThumb
+        ).let {
+            authorRepository.save(it).toAuthorResponse()
         }
     }
 
     @Transactional
-    fun update(authorDto: AuthorDto): AuthorDto {
-        logger.info("Updating author: ${authorDto.name}")
+    fun update(authorCreateRequest: AuthorCreateRequest): AuthorResponse {
+        logger.info("Updating author: ${authorCreateRequest.name}")
 
-        val author = authorRepository.findById(authorDto.id!!)
-            .orElseThrow { NotFoundException("Author not found with id: ${authorDto.id}") }
+        val author = authorRepository.findById(authorCreateRequest.id!!)
+            .orElseThrow { NotFoundException("Author not found with id: ${authorCreateRequest.id}") }
 
-        author.name = authorDto.name
-        author.description = authorDto.description
-        if (authorDto.file != null) {
+        author.name = authorCreateRequest.name
+        author.description = authorCreateRequest.description
+        if (authorCreateRequest.file != null) {
             val authorImage = fileUploadService.createFile(FileDto(
-                name = authorDto.name,
-                file = authorDto.file!!,
+                name = authorCreateRequest.name,
+                file = authorCreateRequest.file!!,
                 fileType = FileType.AUTHOR
             ))
             val authorImageThumb = imageResizeService.createThumb(Path.of(fileProperties.base +"/"+ authorImage.path), FileType.AUTHOR)
             author.imageFile = authorImage
             author.thumbFile = authorImageThumb
         }
-        return authorRepository.save(author).run { authorMapper.toDto(this) }
+
+        return authorRepository.save(author).toAuthorResponse()
     }
 
     @Transactional
-    fun findById(id: String): AuthorDetailsDto {
+    fun findById(id: String): AuthorDetailsResponse {
         logger.info("Finding author by id: $id")
 
-        return authorRepository.findById(id)
-            .map {authorMapper.toDetailsDto(it) }
-            .orElseThrow { NotFoundException("Author not found with id: $id") }
+        return authorRepository.findByIdOrNull(id)?.toAuthorDetailsResponse()
+            ?: throw NotFoundException("Author not found with id: $id")
     }
 
     @Transactional
-    fun getAuthorDetails(id: String): AuthorDetailsDto {
+    fun getAuthorDetails(id: String): AuthorDetailsResponse {
         logger.info("Getting author details $id")
 
         return findById(id).apply {
             books = bookRepository.findByAuthorId(id)
-                .map { bookMapper.toDto(it) }
+                .map { it.toBookResponse() }
                 .toList()
         }
     }
 
     @Transactional
-    fun findAll(search: String?,  pageable: Pageable): Page<AuthorDto> {
+    fun findAll(search: String?,  pageable: Pageable): Page<AuthorResponse> {
         logger.info("Finding all authors")
 
         return authorRepository.findAll(search, pageable)
-            .map { authorMapper.toDto(it) }
+            .map { it.toAuthorResponse() }
     }
 
     @Transactional

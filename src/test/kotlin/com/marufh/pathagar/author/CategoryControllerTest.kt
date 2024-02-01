@@ -3,6 +3,7 @@ package com.marufh.pathagar.author
 import com.fasterxml.jackson.core.type.TypeReference
 import com.marufh.pathagar.BaseTest
 import com.marufh.pathagar.RestPage
+import com.marufh.pathagar.author.dto.AuthorCreateRequest
 import com.marufh.pathagar.author.dto.AuthorDto
 import com.marufh.pathagar.author.entity.Author
 import org.junit.jupiter.api.Test
@@ -11,6 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.util.UUID
 
 class CategoryControllerTest: BaseTest() {
 
@@ -22,18 +24,16 @@ class CategoryControllerTest: BaseTest() {
         // Given
         bookRepository.deleteAll()
         authorRepository.deleteAll()
-        val authors = listOf<Author>(
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-            authMapper.toEntity(getAuthorDto()),
-        ).let { authorRepository.saveAll(it) }
-
-
+        listOf(
+            Author(name = "test author${UUID.randomUUID()}", description = "test description"),
+            Author(name = "test author${UUID.randomUUID()}", description = "test description"),
+            Author(name = "test author${UUID.randomUUID()}", description = "test description"),
+            Author(name = "test author${UUID.randomUUID()}", description = "test description"),
+            Author(name = "test author${UUID.randomUUID()}", description = "test description"),
+        ).map { authorRepository.save(it) }
 
         // When
-        val authorPage = mockMvc.perform(get(AuthorController.AUTHOR_API))
+        val authorPage = mockMvc.perform(get(AUTHOR_URL))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn().response
@@ -51,10 +51,10 @@ class CategoryControllerTest: BaseTest() {
         logger.info("should return author details")
 
         // Given
-        val authorEntity = authorRepository.save(authMapper.toEntity(getAuthorDto()))
+        val authorEntity = authorRepository.save(Author(name = "test author${UUID.randomUUID()}", description = "test description"))
 
         // When
-        val author = mockMvc.perform(get(AuthorController.AUTHOR_API + "/{id}", authorEntity.id))
+        val author = mockMvc.perform(get("$AUTHOR_URL/{id}", authorEntity.id))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andReturn().response

@@ -1,6 +1,8 @@
 package com.marufh.pathagar.book
 
 import com.marufh.pathagar.BaseTest
+import com.marufh.pathagar.book.dto.BookCreateRequest
+import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.exception.NotFoundException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -21,6 +23,7 @@ class BookServiceTest: BaseTest() {
         authorRepository.deleteAll()
         fileMetaRepository.deleteAll()
         Files.deleteIfExists(Path.of(fileProperties.book).resolve("test-book/test-book.pdf"))
+        Files.deleteIfExists(Path.of(fileProperties.book).resolve("test-book/test-book.jpg"))
     }
 
     @Test
@@ -38,7 +41,6 @@ class BookServiceTest: BaseTest() {
         assert(newBook.pdfFile?.path == "book/test-book/test-book.pdf")
         assert(newBook.coverImage?.path == "book/test-book/test-book.jpg")
         assert(newBook.totalPage == 2)
-        assert(newBook.deleted == false)
     }
 
     @Test
@@ -56,22 +58,25 @@ class BookServiceTest: BaseTest() {
     @Test
     fun `test update book`() {
         // Given
-        val bookDto = getBookDto();
-        val newBook = bookService.create(bookDto)
-        newBook.name = "Updated Book Name" + UUID.randomUUID().toString()
-        newBook.description = "Updated Book Description"
+
+        val newBook = bookService.create(getBookDto())
+        val updatedName =  "Updated Book Name" + UUID.randomUUID().toString()
+        val updatedDescription = "Updated Book Description"
 
         // When
-        val updatedBook = bookService.update(newBook)
+        val updatedBook = bookService.update(BookCreateRequest(
+            id = newBook.id,
+            name = updatedName,
+            description = updatedDescription,
+        ))
 
         // Then
         assert(updatedBook.id != null)
-        assert(updatedBook.name == newBook.name)
-        assert(updatedBook.description == newBook.description)
+        assert(updatedBook.name == updatedName)
+        assert(updatedBook.description == updatedDescription)
         assert(updatedBook.pdfFile?.path == "book/test-book/test-book.pdf")
         assert(updatedBook.totalPage == 2)
         assert(updatedBook.coverImage?.path == "book/test-book/test-book.jpg")
-        assert(updatedBook.deleted == newBook.deleted)
     }
 
     @Test
@@ -88,8 +93,7 @@ class BookServiceTest: BaseTest() {
     @Test
     fun `test book find by id`() {
         // Given
-        val bookDto = getBookDto();
-        val createdBook = bookService.create(bookDto)
+        val createdBook = bookService.create(getBookDto())
         val bookFound = bookService.findById(createdBook.id!!);
 
         // Then
@@ -99,7 +103,6 @@ class BookServiceTest: BaseTest() {
         assert(bookFound.pdfFile?.path == "book/test-book/test-book.pdf")
         assert(bookFound.coverImage?.path == "book/test-book/test-book.jpg")
         assert(bookFound.totalPage == 2)
-        assert(bookFound.deleted == false)
     }
 
     @Test
@@ -113,15 +116,13 @@ class BookServiceTest: BaseTest() {
     @Test
     fun `test find all`() {
         // Given
-        bookRepository.deleteAll();
-        val bookList = listOf(
-            bookMapper.toEntity(getBookDto()),
-            bookMapper.toEntity(getBookDto()),
-            bookMapper.toEntity(getBookDto()),
-            bookMapper.toEntity(getBookDto()),
-            bookMapper.toEntity(getBookDto()),
-        )
-        bookRepository.saveAll(bookList)
+        listOf(
+            Book(name = "Book 1", description = "Book 1 description1"),
+            Book(name = "Book 2", description = "Book 1 description2"),
+            Book(name = "Book 3", description = "Book 1 description3"),
+            Book(name = "Book 4", description = "Book 1 description4"),
+            Book(name = "Book 5", description = "Book 1 description5"),
+        ).map { bookRepository.save(it) }
 
         // When
         val result = bookService.findAll("", PageRequest.of(0, 10))
@@ -135,16 +136,16 @@ class BookServiceTest: BaseTest() {
     @Test
     fun `test update author`() {
         // Given
-        var book = bookService.create(getBookDto());
+        val book = bookService.create(getBookDto());
         val author = authorService.create(getAuthorDto())
 
         // Add
-        book = bookService.updateAuthor(book.id!!, author.id!!, "add")
-        assert(book.authors?.size   == 1)
+        val bookDetailsAdd = bookService.updateAuthor(book.id!!, author.id!!, "add")
+        assert(bookDetailsAdd.authors?.size   == 1)
 
         // Add
-        book = bookService.updateAuthor(book.id!!, author.id!!, "remove")
-        assert(book.authors?.size   == 0)
+        val bookDetailsRemove = bookService.updateAuthor(book.id!!, author.id!!, "remove")
+        assert(bookDetailsRemove.authors?.size   == 0)
     }
 
     @Test
@@ -180,12 +181,12 @@ class BookServiceTest: BaseTest() {
         val category = categoryService.create(getCategoryDto())
 
         // Add
-        book = bookService.updateCategory(book.id!!, category.id!!, "add")
-        assert(book.categories?.size   == 1)
+        val bookDetailsAdd = bookService.updateCategory(book.id!!, category.id!!, "add")
+        assert(bookDetailsAdd.categories?.size   == 1)
 
         // Remove
-        book = bookService.updateCategory(book.id!!, category.id!!, "remove")
-        assert(book.categories?.size   == 0)
+        val bookDetailsRemove = bookService.updateCategory(book.id!!, category.id!!, "remove")
+        assert(bookDetailsRemove.categories?.size   == 0)
     }
 
     @Test

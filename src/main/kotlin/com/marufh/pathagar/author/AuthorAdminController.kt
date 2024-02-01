@@ -1,7 +1,8 @@
 package com.marufh.pathagar.author
 
-import com.marufh.pathagar.author.dto.AuthorDetailsDto
-import com.marufh.pathagar.author.dto.AuthorDto
+import com.marufh.pathagar.author.dto.AuthorCreateRequest
+import com.marufh.pathagar.author.dto.AuthorDetailsResponse
+import com.marufh.pathagar.author.dto.AuthorResponse
 import com.marufh.pathagar.author.service.AuthorService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,18 +16,21 @@ class AuthorAdminController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@ModelAttribute authorDto: AuthorDto): AuthorDto = authorService.create(authorDto)
+    fun create(@ModelAttribute authorCreateRequest: AuthorCreateRequest): AuthorResponse =
+        authorService.create(authorCreateRequest)
 
     @PutMapping
-    fun update(@ModelAttribute authorDto: AuthorDto): AuthorDto = authorService.update(authorDto)
+    fun update(@ModelAttribute authorCreateRequest: AuthorCreateRequest): AuthorResponse =
+        authorService.update(authorCreateRequest)
 
     @GetMapping("/{id}")
-    fun getAuthorDetails(@PathVariable id: String): AuthorDetailsDto = authorService.getAuthorDetails(id)
+    fun getAuthorDetails(@PathVariable id: String): AuthorDetailsResponse = authorService.getAuthorDetails(id)
 
     @GetMapping
-    fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<AuthorDto> =
+    fun getAll(@RequestParam(required = false) search: String?, pageable: Pageable): Page<AuthorResponse> =
         authorService.findAll(search, pageable)
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: String) = authorService.delete(id)
 }

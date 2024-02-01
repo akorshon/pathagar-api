@@ -1,6 +1,7 @@
 package com.marufh.pathagar.book
 
 import com.marufh.pathagar.book.dto.BookDto
+import com.marufh.pathagar.book.dto.BookResponse
 import com.marufh.pathagar.book.service.BookService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,5 +18,5 @@ class BookController(val bookService: BookService) {
     @GetMapping
     fun getAll(@RequestParam(required = false) search: String?,
                pageable: Pageable,
-               authentication: Authentication): Page<BookDto> = bookService.findAll(search, pageable)
+               authentication: Authentication): Page<BookResponse> = bookService.findAll(search, pageable)
 }

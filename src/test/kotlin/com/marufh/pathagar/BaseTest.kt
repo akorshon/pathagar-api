@@ -7,16 +7,16 @@ import com.marufh.pathagar.auth.repository.UserRepository
 import com.marufh.pathagar.auth.service.HashService
 import com.marufh.pathagar.auth.service.TokenService
 import com.marufh.pathagar.auth.service.UserService
+import com.marufh.pathagar.author.dto.AuthorCreateRequest
 import com.marufh.pathagar.author.dto.AuthorDto
-import com.marufh.pathagar.author.dto.AuthorMapper
 import com.marufh.pathagar.author.repository.AuthorRepository
 import com.marufh.pathagar.author.service.AuthorService
+import com.marufh.pathagar.book.dto.BookCreateRequest
 import com.marufh.pathagar.book.dto.BookDto
-import com.marufh.pathagar.book.dto.BookMapper
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.service.BookService
+import com.marufh.pathagar.category.dto.CategoryCreateRequest
 import com.marufh.pathagar.category.dto.CategoryDto
-import com.marufh.pathagar.category.dto.CategoryMapper
 import com.marufh.pathagar.category.model.CategoryRepository
 import com.marufh.pathagar.category.service.CategoryService
 import com.marufh.pathagar.config.FileProperties
@@ -45,15 +45,6 @@ class BaseTest {
 
     @Autowired
     lateinit var mockMvc: MockMvc
-
-    @Autowired
-    lateinit var bookMapper: BookMapper
-
-    @Autowired
-    lateinit var authMapper: AuthorMapper
-
-    @Autowired
-    lateinit var categoryMapper: CategoryMapper
 
     @Autowired
     lateinit var objectMapper: ObjectMapper
@@ -114,44 +105,34 @@ class BaseTest {
         )
     }
 
-    fun getAuthorDto(): AuthorDto {
-        return AuthorDto(
-            name = "Test Author" + UUID.randomUUID().toString(),
-            description = "Test Author Description",
-            deleted = false,
-            file = MockMultipartFile("file",
-                "test-author.jpg",
-                "image/jpeg",
-                FileInputStream("src/test/resources/test-author.jpg")
-            )
+    fun getAuthorDto(): AuthorCreateRequest = AuthorCreateRequest(
+        name = "Test Author" + UUID.randomUUID().toString(),
+        description = "Test Author Description",
+        file = MockMultipartFile("file",
+            "test-author.jpg",
+            "image/jpeg",
+            FileInputStream("src/test/resources/test-author.jpg")
         )
-    }
+    )
 
-    fun getCategoryDto(): CategoryDto {
-        return CategoryDto(
-            name = "Test Category" + UUID.randomUUID().toString(),
-            file = MockMultipartFile("file",
-                "test-category.jpg",
-                "image/jpeg",
-                FileInputStream("src/test/resources/test-category.jpg")
-            ),
-            description = "Test  Description",
-            deleted = false,
-        )
-    }
+    fun getCategoryDto(): CategoryCreateRequest = CategoryCreateRequest(
+        name = "Test Category" + UUID.randomUUID().toString(),
+        file = MockMultipartFile("file",
+            "test-category.jpg",
+            "image/jpeg",
+            FileInputStream("src/test/resources/test-category.jpg")
+        ),
+        description = "Test  Description",
+    )
 
-    fun getBookDto(): BookDto {
-        return BookDto(
-            file = MockMultipartFile("file",
-                "test-book.pdf",
-                "application/pdf",
-                FileInputStream("src/test/resources/test-book.pdf")
-            ),
-            name = "Test Book" + UUID.randomUUID().toString(),
-            description = "Test Book Description",
-            totalPage = 100,
-            deleted = false
-        )
-    }
+    fun getBookDto(): BookCreateRequest = BookCreateRequest(
+        file = MockMultipartFile("file",
+            "test-book.pdf",
+            "application/pdf",
+            FileInputStream("src/test/resources/test-book.pdf")
+        ),
+        name = "Test Book" + UUID.randomUUID().toString(),
+        description = "Test Book Description",
+    )
 
 }
