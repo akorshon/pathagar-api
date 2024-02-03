@@ -1,6 +1,5 @@
 package com.marufh.pathagar.file.dto
 
-import com.marufh.pathagar.file.dto.FileMetaResponse
 import com.marufh.pathagar.file.entity.FileMeta
 
 fun FileMeta.toFileMetaResponse() = FileMetaResponse(
