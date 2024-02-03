@@ -1,6 +1,7 @@
-package com.marufh.pathagar.extension
+package com.marufh.pathagar.book.dto
 
 import com.marufh.pathagar.book.dto.UserBookResponse
+import com.marufh.pathagar.book.dto.toBookResponse
 import com.marufh.pathagar.book.entity.UserBook
 
 fun UserBook.toUserBookResponse() = UserBookResponse(

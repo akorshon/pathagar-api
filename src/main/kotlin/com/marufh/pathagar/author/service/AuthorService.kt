@@ -8,9 +8,9 @@ import com.marufh.pathagar.author.repository.AuthorRepository
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
-import com.marufh.pathagar.extension.toAuthorDetailsResponse
-import com.marufh.pathagar.extension.toAuthorResponse
-import com.marufh.pathagar.extension.toBookResponse
+import com.marufh.pathagar.author.dto.toAuthorDetailsResponse
+import com.marufh.pathagar.author.dto.toAuthorResponse
+import com.marufh.pathagar.book.dto.toBookResponse
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
 import com.marufh.pathagar.file.service.FileService

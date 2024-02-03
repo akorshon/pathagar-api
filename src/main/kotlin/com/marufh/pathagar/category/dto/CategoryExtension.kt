@@ -1,8 +1,8 @@
-package com.marufh.pathagar.extension
+package com.marufh.pathagar.category.dto
 
-import com.marufh.pathagar.category.dto.CategoryDetailsResponse
-import com.marufh.pathagar.category.dto.CategoryResponse
+import com.marufh.pathagar.book.dto.toBookResponse
 import com.marufh.pathagar.category.model.Category
+import com.marufh.pathagar.file.dto.toFileMetaResponse
 
 fun Category.toCategoryResponse() = CategoryResponse(
     id = id,

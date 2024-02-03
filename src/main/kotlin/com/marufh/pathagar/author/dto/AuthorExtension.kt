@@ -1,8 +1,8 @@
-package com.marufh.pathagar.extension
+package com.marufh.pathagar.author.dto
 
-import com.marufh.pathagar.author.dto.AuthorDetailsResponse
-import com.marufh.pathagar.author.dto.AuthorResponse
 import com.marufh.pathagar.author.entity.Author
+import com.marufh.pathagar.book.dto.toBookResponse
+import com.marufh.pathagar.file.dto.toFileMetaResponse
 
 fun Author.toAuthorResponse() = AuthorResponse(
         id = this.id,

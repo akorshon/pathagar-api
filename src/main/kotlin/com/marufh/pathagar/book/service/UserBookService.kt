@@ -9,7 +9,7 @@ import com.marufh.pathagar.book.entity.UserBookStatus
 import com.marufh.pathagar.book.repository.BookRepository
 import com.marufh.pathagar.book.repository.UserBookRepository
 import com.marufh.pathagar.exception.NotFoundException
-import com.marufh.pathagar.extension.toUserBookResponse
+import com.marufh.pathagar.book.dto.toUserBookResponse
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page

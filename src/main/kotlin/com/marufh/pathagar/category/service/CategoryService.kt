@@ -6,9 +6,9 @@ import com.marufh.pathagar.category.model.Category
 import com.marufh.pathagar.category.model.CategoryRepository
 import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
-import com.marufh.pathagar.extension.toBookResponse
-import com.marufh.pathagar.extension.toCategoryDetailsResponse
-import com.marufh.pathagar.extension.toCategoryResponse
+import com.marufh.pathagar.book.dto.toBookResponse
+import com.marufh.pathagar.category.dto.toCategoryDetailsResponse
+import com.marufh.pathagar.category.dto.toCategoryResponse
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
 import com.marufh.pathagar.file.service.FileService
