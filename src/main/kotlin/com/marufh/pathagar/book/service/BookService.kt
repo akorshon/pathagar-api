@@ -11,8 +11,10 @@ import com.marufh.pathagar.config.FileProperties
 import com.marufh.pathagar.exception.NotFoundException
 import com.marufh.pathagar.book.dto.toBookDetailsResponse
 import com.marufh.pathagar.book.dto.toBookResponse
+import com.marufh.pathagar.book.repository.UserBookRepository
 import com.marufh.pathagar.file.dto.FileDto
 import com.marufh.pathagar.file.entity.FileType
+import com.marufh.pathagar.file.repository.FileMetaRepository
 import com.marufh.pathagar.file.service.FileService
 import com.marufh.pathagar.file.service.FileUploadService
 import com.marufh.pathagar.file.service.PdfService
@@ -32,6 +34,8 @@ class BookService(
     private val fileProperties: FileProperties,
     private val fileUploadService: FileUploadService,
     private val categoryRepository: CategoryRepository,
+    private val fileMetaRepository: FileMetaRepository,
+    private val userBookRepository: UserBookRepository,
     private val authorRepository: AuthorRepository) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -150,10 +154,15 @@ class BookService(
        val book =  bookRepository.findById(id)
             .orElseThrow{ NotFoundException("Book not found with id: $id") }
 
-        if(book.deleted == true) {
-            // Hard delete
-            fileService.deleteFiles(book.pdfFile?.path!!, book.coverImage?.path!!)
+        if(book.deleted == true) { // Hard delete
+            // Delete files,
             bookRepository.delete(book)
+            book.pdfFile?.id?.let { fileMetaRepository.deleteById(it) }
+            book.coverImage?.id?.let { fileMetaRepository.deleteById(it) }
+            userBookRepository.findByBookId(id)?.forEach {
+                userBookRepository.deleteById(it.id!!)
+            }
+            fileService.deleteFiles(book.pdfFile?.path!!, book.coverImage?.path!!)
         } else {
             // Soft delete
             book.deleted = true

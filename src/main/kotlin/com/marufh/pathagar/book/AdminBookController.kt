@@ -20,7 +20,7 @@ class AdminBookController(
     fun create(@ModelAttribute bookCreateRequest: BookCreateRequest): BookResponse = bookService.create(bookCreateRequest)
 
     @PutMapping
-    fun update(@RequestBody bookCreateRequest: BookCreateRequest): BookResponse = bookService.update(bookCreateRequest)
+    fun update(@ModelAttribute bookCreateRequest: BookCreateRequest): BookResponse = bookService.update(bookCreateRequest)
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: String): BookDetailsResponse = bookService.findById(id)

@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.0.6"
-	id("io.spring.dependency-management") version "1.1.0"
+	id("org.springframework.boot") version "3.2.2"
+	id("io.spring.dependency-management") version "1.1.4"
 	id ("org.sonarqube") version "4.2.1.3168"
 	id ("jacoco")
 	kotlin("jvm") version "1.7.22"
@@ -11,8 +11,8 @@ plugins {
 }
 
 group = "com.marufh"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+version = "1.0.0"
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 repositories {
 	mavenCentral()
@@ -40,12 +40,14 @@ dependencies {
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
+
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "17"
 	}
 }
+
 
 tasks.withType<Test> {
 	useJUnitPlatform()

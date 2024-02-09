@@ -15,6 +15,12 @@ interface UserBookRepository: JpaRepository<UserBook, String> {
     fun findByUserAndBookId(userEmail: String, bookId: String): UserBook?
 
     @Query("SELECT ub FROM UserBook ub " +
+            "left join ub.book b " +
+            "WHERE b.id = ?1")
+    fun findByBookId(bookId: String): List<UserBook>?
+
+
+    @Query("SELECT ub FROM UserBook ub " +
             "join  ub.book b " +
             "WHERE ub.userEmail = ?1")
     fun findAll(userEmail: String, pageable: Pageable): Page<UserBook>

@@ -7,9 +7,9 @@
 "Pathagar" (পাঠাগার) is a Bengali word meaning "library". The aim of this project is to maintain a library (mostly pdf books).
 
 ## Technology Stack
-* Kotlin
-* Gradle
-* Jvm 17
+* Kotlin 
+* Gradle 
+* Jvm 21
 * Spring Boot
   * Spring Data JPA
   * Spring Security

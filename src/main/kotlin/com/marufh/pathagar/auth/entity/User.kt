@@ -13,8 +13,8 @@ data class User(
     var password: String = "",
 
     @ElementCollection(targetClass = Role::class)
-    @JoinTable(name = "user_role")
-    @JoinColumn(name = "role", nullable = false)
+    @CollectionTable(name = "user_role", joinColumns = [JoinColumn(name = "user_id")])
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     var roles: Set<Role> = emptySet()
 ): BaseEntity()
