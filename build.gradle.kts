@@ -48,16 +48,16 @@ tasks.withType<KotlinCompile> {
 	}
 }
 
-
 tasks.withType<Test> {
 	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.bootRun {
 	args("--spring.profiles.active=dev")
 }
 
-tasks.jacocoTestReport {
+tasks.withType<JacocoReport> {
 	reports {
 		xml.required = true
 	}
