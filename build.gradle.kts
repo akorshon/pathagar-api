@@ -57,7 +57,7 @@ tasks.bootRun {
 	args("--spring.profiles.active=dev")
 }
 
-tasks.withType<JacocoReport> {
+tasks.jacocoTestReport {
 	reports {
 		xml.required = true
 	}
