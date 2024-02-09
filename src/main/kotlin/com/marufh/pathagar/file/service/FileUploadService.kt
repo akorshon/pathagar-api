@@ -35,7 +35,6 @@ class FileUploadService(
 
         fileMetaRepository.findByHash(hash)?.let {
             return it
-            //throw AlreadyExistException("File already exist")
         }
 
        return FileMeta(
