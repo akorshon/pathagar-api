@@ -3,8 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "3.2.2"
 	id("io.spring.dependency-management") version "1.1.4"
-	id ("org.sonarqube") version "4.2.1.3168"
 	id ("jacoco")
+	id ("org.sonarqube") version "4.2.1.3168"
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 	kotlin("plugin.jpa") version "1.7.22"
@@ -59,6 +59,6 @@ tasks.bootRun {
 
 tasks.jacocoTestReport {
 	reports {
-		xml.required.set(true)
+		xml.required = true
 	}
 }
