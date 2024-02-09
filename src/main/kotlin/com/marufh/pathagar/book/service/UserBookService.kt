@@ -1,8 +1,10 @@
 package com.marufh.pathagar.book.service
 
+import com.marufh.pathagar.auth.entity.Role
 import com.marufh.pathagar.auth.entity.User
 import com.marufh.pathagar.book.dto.UserBookRequest
 import com.marufh.pathagar.book.dto.UserBookResponse
+import com.marufh.pathagar.book.dto.toBookResponse
 import com.marufh.pathagar.book.entity.Book
 import com.marufh.pathagar.book.entity.UserBook
 import com.marufh.pathagar.book.entity.UserBookStatus
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.time.Instant
+import kotlin.math.log
 
 @Service
 class UserBookService(
@@ -26,6 +29,17 @@ class UserBookService(
 
     fun create(user: User, book: Book): UserBookResponse {
         logger.info("Creating user {} book{}", user.email, book.name)
+
+        user.roles.map { role ->
+            if (role.name == Role.ROLE_ADMIN.name) {
+                return UserBookResponse(
+                    book = book.toBookResponse(),
+                    userEmail = user.email,
+                    page = 0,
+                    status = UserBookStatus.READING,
+                )
+            }
+        }
 
         val userBook = UserBook(
             userEmail = user.email,
@@ -40,6 +54,18 @@ class UserBookService(
 
     fun update(user: User, usrBookRequest: UserBookRequest): UserBookResponse {
         logger.info("Updating user: {}, book: {}", user.id, usrBookRequest.id)
+
+        user.roles.map { role ->
+            if (role.name == Role.ROLE_ADMIN.name) {
+                return UserBookResponse(
+                    book = usrBookRequest.book.toBookResponse(),
+                    userEmail = user.email,
+                    page = usrBookRequest.page,
+                    status = usrBookRequest.status,
+                )
+            }
+        }
+
 
         val found = userBookRepository.findByUserAndBookId(user.email, usrBookRequest.book.id!!)?:
             throw EntityNotFoundException("UserBook not found with user: ${user.email} and book id: ${usrBookRequest.book.id}")

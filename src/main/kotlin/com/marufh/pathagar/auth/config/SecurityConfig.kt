@@ -30,38 +30,26 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         logger.info("Configuring security filter chain")
 
+
             http
-            .csrf().disable()
-            .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint)
-
-            .and()
-            .cors()
-
-            .and()
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/auth/registration").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
-
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
-            .requestMatchers("/api/user/**").hasAnyRole( "USER", "ADMIN")
-            .anyRequest().authenticated()
-
-
-            .and()
-            .oauth2ResourceServer().jwt()
+                .csrf { it.disable() }
+                .exceptionHandling { it.authenticationEntryPoint(authenticationEntryPoint) }
+                .cors { it.configurationSource(corsConfigurationSource()) }
+                .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+                .authorizeHttpRequests { it
+                    .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/auth/registration").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/user/**").hasAnyRole( "USER", "ADMIN")
+                    .anyRequest().authenticated()
+                }
+            .oauth2ResourceServer { it.jwt { } }
             .authenticationManager { auth ->
                 val jwt = auth as BearerTokenAuthenticationToken
                 val user = tokenService.parseToken(jwt.token)?: throw InvalidBearerTokenException("Invalid token")
                 UsernamePasswordAuthenticationToken(user, null, listOf(user.roles.map { SimpleGrantedAuthority(it.name) }).flatten())
             }
-
         return http.build()
     }
 

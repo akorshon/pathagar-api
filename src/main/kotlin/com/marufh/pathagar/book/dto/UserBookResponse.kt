@@ -4,11 +4,12 @@ import com.marufh.pathagar.book.entity.UserBookStatus
 import java.time.Instant
 
 data class UserBookResponse(
-    val id: String? = null,
     val book: BookResponse,
     var userEmail:String,
     var page:Int,
     var status: UserBookStatus,
+
+    val id: String? = null,
     val started:Instant ? = null,
     val ended:Instant ? = null,
     var rating:Int? = null,

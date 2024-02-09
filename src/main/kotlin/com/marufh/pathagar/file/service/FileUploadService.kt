@@ -34,7 +34,7 @@ class FileUploadService(
         val size = file.length()
 
         fileMetaRepository.findByHash(hash)?.let {
-            throw AlreadyExistException("File already exist")
+            return it
         }
 
        return FileMeta(

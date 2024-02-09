@@ -11,7 +11,7 @@ import jakarta.persistence.*
 @Table(name = "book")
 class Book(
 
-    @Column(name = "name", length = 512, unique = true)
+    @Column(name = "name", length = 512)
     var name: String,
 
     @Column(name = "description", length = 2048)
