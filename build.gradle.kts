@@ -1,5 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+group = "com.marufh"
+version = "1.0.0"
+java.sourceCompatibility = JavaVersion.VERSION_21
+
 plugins {
 	id("org.springframework.boot") version "3.2.2"
 	id("io.spring.dependency-management") version "1.1.4"
@@ -10,10 +14,13 @@ plugins {
 	kotlin("plugin.jpa") version "1.7.22"
 }
 
-group = "com.marufh"
-version = "1.0.0"
-java.sourceCompatibility = JavaVersion.VERSION_21
-
+sonar {
+	properties {
+		property("sonar.projectKey", "akorshon_pathagar-api")
+		property("sonar.organization", "akorshon")
+		property("sonar.host.url", "https://sonarcloud.io")
+	}
+}
 repositories {
 	mavenCentral()
 }
@@ -50,14 +57,13 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
-	finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.bootRun {
 	args("--spring.profiles.active=dev")
 }
 
-tasks.withType<JacocoReport> {
+tasks.jacocoTestReport {
 	reports {
 		xml.required = true
 	}
